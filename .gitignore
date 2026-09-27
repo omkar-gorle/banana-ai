@@ -9,6 +9,9 @@ __pycache__/
 # Training outputs
 models/*.pt
 models/*.pth
+# Production inference checkpoints are required by the deployed Streamlit app.
+!models/banana_cnn_v2.pt
+!models/banana_cnn_best.pt
 reports/v1/
 reports/v2/
 reports/explainability/

@@ -1,6 +1,6 @@
-# Banana AI — From-Scratch Ripeness Classifier
+# Banana AI — Banana Quality & Shelf-Life Intelligence System
 
-A complete ML pipeline that classifies banana ripeness from images using a **custom CNN trained from scratch** (no pretrained weights).
+A complete ML pipeline that classifies banana ripeness from images using a **custom CNN trained from scratch** (no pretrained weights), enhanced with environment-aware shelf-life estimation, batch analysis, feedback collection, and a mobile-friendly multi-page Streamlit UI.
 
 ## Classes
 
@@ -228,7 +228,7 @@ shelf-life value is a prototype heuristic.
 
 API docs: http://127.0.0.1:8000/docs
 
-Example response:
+Example response (with optional `temperature_c=27&humidity_pct=65` query params):
 ```json
 {
   "predicted_stage": "ripe",
@@ -240,8 +240,12 @@ Example response:
     "unripe": 0.05
   },
   "model_version": "banana-cnn-v2",
-  "estimated_days_left": "2-4 days",
-  "shelf_life_warning": "estimated_days_left is a PROTOTYPE heuristic estimate based on the predicted ripeness stage. It is NOT a trained shelf-life model."
+  "estimated_days_left": "1-3 days",
+  "estimated_min_days": 1,
+  "estimated_max_days": 3,
+  "shelf_life_method": "heuristic",
+  "shelf_life_warning": "estimated_days_left is a PROTOTYPE heuristic estimate. It is NOT a trained shelf-life model and NOT a food-safety guarantee.",
+  "prediction_id": 42
 }
 ```
 
@@ -254,16 +258,45 @@ $env:PYTHONPATH="src"
 streamlit run src/banana_ai/app.py
 ```
 
-Features:
-1. Upload banana image
-2. Run CNN classification
-3. View predicted ripeness with colour coding
-4. View confidence score
-5. View all class probabilities
-6. View prototype shelf-life estimate (clearly labelled as heuristic)
-7. Generate Grad-CAM explanation
-8. Save observation to PostgreSQL
-9. Browse recent prediction history
+### Free deployment on Streamlit Community Cloud
+
+This repository is ready to deploy at no cost on
+[Streamlit Community Cloud](https://share.streamlit.io/):
+
+1. Push the repository to GitHub.
+2. Sign in to Streamlit Community Cloud with the GitHub account that owns
+   `omkar-gorle/banana-ai`.
+3. Select **New app**, choose `omkar-gorle/banana-ai`, and set the branch to
+   `main`.
+4. Set **Main file path** to `src/banana_ai/app.py`.
+5. Deploy. Streamlit installs `requirements.txt` automatically.
+
+The V2 checkpoint is included in `models/banana_cnn_v2.pt`, so the deployed
+app can perform inference without downloading a private artifact. PostgreSQL
+features are optional; image analysis and reports work without a database.
+If database persistence is needed, add a `DATABASE_URL` secret in the
+Streamlit app settings. Never commit `.env` or database credentials.
+
+Multi-page app (sidebar navigation):
+
+**Analyze page:**
+1. Camera capture (mobile browser) OR file upload — both always available
+2. Image security validation before ML pipeline
+3. Run V2 CNN classification
+4. Styled prediction card with stage, confidence, model version
+5. Quality assessment per stage
+6. Eat-first priority label
+7. All 4 class probabilities as progress bars
+8. Environment-aware shelf-life estimate (prototype heuristic)
+9. What-if environment simulator
+10. Optional Grad-CAM explanation (expander)
+11. HTML + CSV report download
+12. Explicit save to PostgreSQL (duplicate-save protected)
+13. Human feedback (correct/incorrect + optional correction)
+
+**Other pages:** Batch Analysis, Prediction History, Analytics, Waste Insights, About AI
+
+See `docs/FEATURES.md` for full feature documentation.
 
 ---
 
@@ -292,29 +325,25 @@ Output:
 
 The dataset contains **ripeness class labels only** — not longitudinal `days_left` values.
 
-The current estimate is a **lookup table only**:
-```python
-STAGE_RANGES = {
-    "unripe":   (3, 7),   # days — HEURISTIC
-    "ripe":     (2, 4),   # days — HEURISTIC
-    "overripe": (0, 2),   # days — HEURISTIC
-    "rotten":   (0, 0),   # days — HEURISTIC
-}
-```
+The shelf-life estimator (`src/banana_ai/services/shelf_life.py`) uses a bounded linear formula:
+- **Baseline stage ranges**: unripe 4-7, ripe 2-4, overripe 0-2, rotten 0 days
+- **Temperature adjustment**: 0.08 days/°C deviation from 22°C reference
+- **Humidity adjustment**: 0.05 days/% deviation from 60% reference
+- **Storage multipliers**: room ×1.0, cool ×1.3, refrigerator ×1.6
+- **Output clamped**: [0, 14] days
 
-### Required for a trained shelf-life model
+All coefficients are **prototype assumptions, not experimentally validated constants**.
 
-Collect longitudinal observations of the **same banana over multiple days**:
+See `docs/SHELF_LIFE.md` for full methodology.
 
+### Architecture for future trained model
+
+`ShelfLifeEstimator` (abstract) → `HeuristicShelfLifeEstimator` (current) → `MLShelfLifeEstimator` (future)
+
+Required longitudinal dataset (split by `banana_id` to prevent leakage):
 ```csv
-banana_id, image_path, temperature_c, humidity_pct, days_left
-B001, day0.jpg, 27, 65, 5
-B001, day1.jpg, 27, 66, 4
-B001, day2.jpg, 28, 68, 3
+banana_id, image_path, temperature_c, humidity_pct, storage_condition, days_since_start, days_left, observed_stage
 ```
-
-Splits must be by `banana_id` to prevent leakage.
-The training script `src/banana_ai/ml/train_shelf_life.py` is ready and will refuse to run until real data exists.
 
 ---
 
@@ -325,15 +354,21 @@ $env:PYTHONPATH="src"
 pytest
 ```
 
-53 tests covering:
+**126 tests** (55 original + 71 new) covering:
 - Model construction, parameter count (~422,788), forward pass, output shape
 - Device detection, CPU threading, checkpoint loading/saving
 - Data transforms, image normalization
 - Prediction pipeline (probabilities, class validity, confidence range)
-- Shelf-life prototype estimates and labelling
-- Database ORM model column validation
-- FastAPI `/health` endpoint
-- Grad-CAM heatmap generation
+- Enhanced shelf-life service (environment-aware, all stages, boundaries)
+- Temperature and humidity boundary clamping
+- What-if simulation determinism
+- Image validation and security
+- Batch analysis helpers
+- HTML/CSV report generation
+- Extended database model columns
+- PredictionFeedback table
+- FastAPI backward compatibility
+- Model version consistency
 
 ---
 

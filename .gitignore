@@ -1,0 +1,31 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.pytest_cache/
+.mypy_cache/
+.DS_Store
+
+# Training outputs
+models/*.pt
+models/*.pth
+reports/v1/
+reports/v2/
+reports/explainability/
+reports/training_history.json
+reports/*.png
+reports/*.json
+reports/*.log
+reports/tmp*
+
+# User data
+data/train/*
+data/test/*
+data/val/*
+data/longitudinal/*
+
+# Keep folder structure
+!data/train/.gitkeep
+!data/test/.gitkeep
+!data/val/.gitkeep
+!data/longitudinal/shelf_life_template.csv

@@ -1,0 +1,34 @@
+banana_id,image_path,temperature_c,humidity_pct,days_left
+# This file is a SCHEMA TEMPLATE only.
+# Do NOT fill this with fabricated values.
+#
+# Required columns:
+#   banana_id     - unique identifier for each physical banana (e.g. B001)
+#   image_path    - path to the photograph taken on that day
+#   temperature_c - ambient temperature in Celsius at time of photo
+#   humidity_pct  - relative humidity percentage at time of photo
+#   days_left     - REAL measured days until the banana becomes inedible
+#
+# Collection protocol:
+#   1. Assign a unique banana_id to each banana
+#   2. Photograph the same banana every day under recorded conditions
+#   3. Record temperature and humidity at photo time
+#   4. Record days_left based on actual spoilage observation
+#   5. Continue until the banana is inedible (days_left = 0)
+#
+# Example rows (DO NOT USE - these are illustrative only):
+# B001,data/longitudinal/b001_day0.jpg,27,65,5
+# B001,data/longitudinal/b001_day1.jpg,27,66,4
+# B001,data/longitudinal/b001_day2.jpg,28,68,3
+# B001,data/longitudinal/b001_day3.jpg,28,70,2
+# B001,data/longitudinal/b001_day4.jpg,29,72,1
+# B001,data/longitudinal/b001_day5.jpg,29,75,0
+#
+# Splitting rule: ALWAYS split by banana_id, never by image.
+# Splitting by image would cause data leakage (same banana in train and test).
+#
+# Run training with:
+#   python -m banana_ai.ml.train_shelf_life
+#
+# The training script will refuse to run if this file contains
+# fabricated or missing days_left values.

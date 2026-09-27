@@ -25,9 +25,16 @@ from __future__ import annotations
 
 import io
 import logging
+import sys
 import tempfile
 from pathlib import Path
 from typing import Optional
+
+# Streamlit Cloud executes this file directly, so the src-layout package
+# directory is not guaranteed to be on Python's import path.
+SRC_DIR = Path(__file__).resolve().parents[1]
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
 
 import streamlit as st
 from PIL import Image

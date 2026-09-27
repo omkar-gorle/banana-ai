@@ -17,6 +17,7 @@ reports/*.png
 reports/*.json
 reports/*.log
 reports/tmp*
+reports/*_training_log.txt
 
 # User data
 data/train/*

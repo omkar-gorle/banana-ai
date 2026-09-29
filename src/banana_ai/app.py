@@ -83,6 +83,42 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+.block-container { max-width: 1180px; padding-top: 2rem; padding-bottom: 4rem; }
+.hero { background: linear-gradient(135deg, #17211b 0%, #243b2a 58%, #3d542e 100%); border: 1px solid rgba(255, 214, 74, .22); border-radius: 24px; padding: 34px 38px; margin-bottom: 22px; color: #f8faf7; box-shadow: 0 18px 40px rgba(20, 35, 25, .18); }
+.hero-kicker { color: #f6d34a; font-size: .78rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+.hero h1 { color: #fffdf2; font-size: clamp(2rem, 5vw, 3.3rem); line-height: 1.05; margin: 10px 0; }
+.hero p { color: #dce8d8; font-size: 1.05rem; max-width: 640px; margin-bottom: 18px; }
+.online-badge { display: inline-block; color: #b8f2c2; background: rgba(71, 184, 99, .15); border: 1px solid rgba(130, 230, 145, .3); border-radius: 999px; padding: 6px 12px; font-size: .78rem; font-weight: 700; }
+.step-strip { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 24px; }
+.step { flex: 1 1 150px; background: #f7f8f4; border: 1px solid #e5e9df; border-radius: 14px; padding: 12px 14px; color: #526052; font-size: .86rem; }
+.step strong { display: block; color: #233326; font-size: .92rem; margin-bottom: 3px; }
+.step-active { background: #fff9dd; border-color: #f0d45c; }
+.input-card { background: #ffffff; border: 1px solid #e5e9df; border-radius: 20px; padding: 24px; box-shadow: 0 10px 28px rgba(31, 45, 35, .06); }
+.input-card h2 { color: #243326; margin-top: 0; }
+.eyebrow { color: #8a7620; font-size: .74rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+.empty-state { text-align: center; background: #fbfcf9; border: 1px dashed #cfd9cc; border-radius: 18px; padding: 28px 18px; color: #667466; }
+.empty-icon { font-size: 2.5rem; }
+.section-title { color: #243326; margin: 28px 0 10px; }
+.tech-note { color: #687568; font-size: .83rem; }
+.stButton > button, .stDownloadButton > button { border-radius: 11px; font-weight: 650; min-height: 2.6rem; }
+.result-panel { background: #fff; border: 1px solid #e5e9df; border-radius: 20px; padding: 22px; box-shadow: 0 10px 28px rgba(31, 45, 35, .06); height: 100%; }
+.result-label { color: #728071; font-size: .74rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.result-stage { font-size: clamp(2.4rem, 6vw, 4.5rem); font-weight: 800; line-height: 1; margin: 12px 0 8px; }
+.result-confidence { color: #324335; font-size: 1.05rem; }
+.confidence-track { background: #edf1e9; border-radius: 999px; height: 10px; margin: 14px 0 6px; overflow: hidden; }
+.confidence-fill { background: linear-gradient(90deg, #d4ae27, #f5d85d); border-radius: inherit; height: 100%; }
+.metric-card { background: #f8faf6; border: 1px solid #e7ece3; border-radius: 15px; padding: 15px; }
+.metric-card .metric-value { color: #26382a; font-size: 1.35rem; font-weight: 750; }
+.metric-card .metric-label { color: #718071; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
+.prob-row { margin: 10px 0; }
+.prob-head { display: flex; justify-content: space-between; color: #435246; font-size: .86rem; }
+.prob-track { background: #edf1e9; border-radius: 999px; height: 8px; margin-top: 5px; overflow: hidden; }
+.prob-fill { background: #d8b629; border-radius: inherit; height: 100%; }
+@media (max-width: 640px) {
+    .hero { padding: 26px 22px; }
+    .block-container { padding-left: 1rem; padding-right: 1rem; }
+    .result-stage { font-size: 3rem; }
+}
 .prediction-card {
     background: linear-gradient(135deg, #121829 0%, #1e293b 100%);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -210,9 +246,12 @@ def _validate_and_save_temp(
   </p>
   <div style="margin-top:14px;display:flex;align-items:center;gap:8px">
     <span class="gate-badge gate-badge-fail">Gate Confidence: {conf:.1%}</span>
-    <span style="color:#9e9e9e;font-size:0.8rem">(Threshold: 38.0%)</span>
+    <span style="color:#9e9e9e;font-size:0.8rem">(Threshold: {threshold:.1%})</span>
   </div>
-</div>""".format(conf=banana_result.confidence),
+</div>""".format(
+    conf=banana_result.confidence,
+    threshold=settings.banana_gate_threshold,
+),
             unsafe_allow_html=True,
         )
         return None, banana_result
@@ -235,9 +274,12 @@ def _validate_and_save_temp(
   </ul>
   <div style="margin-top:14px;display:flex;align-items:center;gap:8px">
     <span class="gate-badge gate-badge-fail" style="background:rgba(255,167,38,0.15);color:#ffa726;border-color:rgba(255,167,38,0.3)">Gate Confidence: {conf:.1%}</span>
-    <span style="color:#9e9e9e;font-size:0.8rem">(Threshold: 38.0%)</span>
+    <span style="color:#9e9e9e;font-size:0.8rem">(Threshold: {threshold:.1%})</span>
   </div>
-</div>""".format(conf=banana_result.confidence),
+</div>""".format(
+    conf=banana_result.confidence,
+    threshold=settings.banana_gate_threshold,
+),
             unsafe_allow_html=True,
         )
         return None, banana_result
@@ -308,15 +350,10 @@ def _save_feedback_to_db(feedback: str, corrected_stage: Optional[str]) -> None:
 # ---------------------------------------------------------------------------
 
 with st.sidebar:
-    st.markdown("## Banana AI")
-    st.caption("Quality & Shelf-Life Intelligence System")
+    st.markdown("## 🍌 Banana AI")
+    st.caption("Smart vision for banana quality")
     st.divider()
 
-    st.markdown("### Model")
-    st.code(settings.model_path, language=None)
-    st.write(f"**Version:** `{settings.model_version}`")
-
-    st.divider()
     st.markdown("### Environment (optional)")
     temperature = st.number_input(
         "Temperature (deg C)", -20.0, 60.0, 25.0, 0.5, key="temp_input"
@@ -355,6 +392,10 @@ with st.sidebar:
             "and classified by banana-cnn-v2 (custom CNN, ~422,788 params). "
             "Probabilities are raw softmax scores -- not calibrated confidence."
         )
+    with st.expander("Technical details"):
+        st.code(settings.model_path, language=None)
+        st.write(f"**Version:** `{settings.model_version}`")
+        st.caption("Production checkpoints are frozen and loaded through the cached inference path.")
 
 
 # ===========================================================================
@@ -362,14 +403,22 @@ with st.sidebar:
 # ===========================================================================
 
 def page_analyze():
-    st.title("Banana AI")
-    st.caption(
-        "Banana Quality & Shelf-Life Intelligence System | "
-        f"Model: {settings.model_version}"
-    )
-    st.info(
-        "Mobile users: Tap 'Take Photo' to use your device camera, "
-        "or 'Upload Photo' to select an existing image."
+    st.markdown(
+        """
+        <section class="hero">
+          <div class="hero-kicker">🍌 Banana AI · Computer Vision</div>
+          <h1>Smart vision for banana quality.</h1>
+          <p>Analyze ripeness, understand the result, and estimate a quality window with an explainable AI workflow.</p>
+          <span class="online-badge">● AI SYSTEM ONLINE</span>
+        </section>
+        <div class="step-strip">
+          <div class="step step-active"><strong>1 · Capture</strong>Upload or take a photo.</div>
+          <div class="step"><strong>2 · Validate</strong>Banana gate checks the image.</div>
+          <div class="step"><strong>3 · Analyze</strong>Ripeness model classifies it.</div>
+          <div class="step"><strong>4 · Insights</strong>Explanation and shelf-life.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
     # FEATURE 1 -- Dual input
@@ -380,7 +429,10 @@ def page_analyze():
     active_input_method: str = "upload"
 
     with tab_camera:
-        st.markdown("**Use your device camera to capture a banana.**")
+        st.markdown(
+            '<div class="input-card"><div class="eyebrow">Step 1 · Capture image</div><h2>Take a photo</h2><p class="tech-note">Place a banana clearly inside the frame, in good light.</p>',
+            unsafe_allow_html=True,
+        )
         st.caption(
             "Camera input works in modern browsers that support camera access. "
             "If camera is unavailable or permission is denied, use Upload Photo."
@@ -395,9 +447,13 @@ def page_analyze():
             active_filename = "camera_capture.jpg"
             active_input_method = "camera"
             st.success("Photo captured! Press Analyze Banana below.")
+        st.markdown("</div>", unsafe_allow_html=True)
 
     with tab_upload:
-        st.markdown("**Upload an existing banana photo.**")
+        st.markdown(
+            '<div class="input-card"><div class="eyebrow">Step 1 · Capture image</div><h2>Upload a photo</h2><p class="tech-note">JPG, PNG, or WEBP · Keep the banana centered and visible.</p>',
+            unsafe_allow_html=True,
+        )
         uploaded_file = st.file_uploader(
             "Choose a banana image",
             type=["jpg", "jpeg", "png", "webp"],
@@ -409,6 +465,7 @@ def page_analyze():
             active_filename = uploaded_file.name
             active_input_method = "upload"
             st.success(f"File loaded: {uploaded_file.name}")
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # Image preview + analyze button
     if active_image_bytes:
@@ -457,6 +514,17 @@ def page_analyze():
                     except (OSError, ValueError, RuntimeError) as exc:
                         st.error(f"Could not analyse image: {exc}")
                         logger.exception("Prediction error")
+    elif not st.session_state.get("prediction"):
+        st.markdown(
+            """
+            <div class="empty-state">
+              <div class="empty-icon">🍌</div>
+              <strong>Your banana analysis will appear here.</strong>
+              <div>Upload or capture an image to get started.</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
     # Results
     result = st.session_state.get("prediction")
@@ -466,26 +534,32 @@ def page_analyze():
         probabilities = result["probabilities"]
         input_method = st.session_state.get("prediction_input_method", "upload")
 
-        st.divider()
+        st.markdown('<h2 class="section-title">Analysis complete</h2>', unsafe_allow_html=True)
 
-        # FEATURE 2 -- Prediction result card
         detection_conf = st.session_state.get("banana_detection_confidence", 0.0)
-        st.markdown(f"""
-        <div class="prediction-card">
-            <h2>BANANA ANALYSIS</h2>
-            <p class="stage-{stage}">{stage.upper()}</p>
-            <p>Ripeness confidence: <strong>{confidence:.1%}</strong></p>
-            <p style="font-size:0.85rem;color:#a5d6a7">
-                &#127820; Banana detection: <strong>{detection_conf:.0%}</strong>
-            </p>
-            <p style="font-size:0.8rem;opacity:0.7">
-                Model: {settings.model_version} | Input: {input_method.capitalize()}
-            </p>
-            <p style="font-size:0.75rem;opacity:0.6">
-                Confidence is a raw softmax score, not a calibrated probability.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
+        preview_path = st.session_state.get("prediction_path")
+        result_col, image_col = st.columns([1.15, 0.85], gap="large")
+        with result_col:
+            st.markdown(f"""
+            <div class="result-panel">
+              <div class="result-label">🍌 AI analysis complete</div>
+              <div class="result-stage stage-{stage}">{stage.upper()}</div>
+              <div class="result-confidence"><strong>{confidence:.1%}</strong> AI confidence</div>
+              <div class="confidence-track"><div class="confidence-fill" style="width:{confidence:.1%}"></div></div>
+              <div class="tech-note">Raw softmax score, not a calibrated probability.</div>
+              <div class="metric-card" style="margin-top:18px">
+                <div class="metric-label">Banana gate</div>
+                <div class="metric-value">{detection_conf:.1%} detected</div>
+                <div class="tech-note">Validated before ripeness analysis.</div>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+        with image_col:
+            st.markdown('<div class="result-panel"><div class="result-label">Your image</div>', unsafe_allow_html=True)
+            if preview_path and Path(preview_path).exists():
+                st.image(Image.open(preview_path).convert("RGB"), use_container_width=True)
+            st.caption(f"{input_method.capitalize()} · ready for review")
+            st.markdown("</div>", unsafe_allow_html=True)
 
         # FEATURE 3 -- Quality assessment
         assessment = _ASSESSMENT.get(stage, "Assessment unavailable.")
@@ -496,17 +570,21 @@ def page_analyze():
         if priority_label:
             st.markdown(f"**Eat-First Priority:** {priority_label}")
 
-        # Class probabilities (FEATURE 2)
-        with st.expander("All class probabilities", expanded=True):
-            for name, prob in sorted(
-                probabilities.items(), key=lambda x: x[1], reverse=True
-            ):
-                st.progress(prob, text=f"{name.capitalize()}: {prob:.1%}")
-            st.caption("Raw softmax scores. All four scores sum to ~100%.")
+        st.markdown('<h3 class="section-title">Ripeness distribution</h3>', unsafe_allow_html=True)
+        probability_html = []
+        for name, prob in sorted(probabilities.items(), key=lambda x: x[1], reverse=True):
+            probability_html.append(
+                f'<div class="prob-row"><div class="prob-head"><span>{name.capitalize()}</span><strong>{prob:.1%}</strong></div>'
+                f'<div class="prob-track"><div class="prob-fill" style="width:{prob:.1%}"></div></div></div>'
+            )
+        st.markdown(
+            '<div class="result-panel">' + "".join(probability_html)
+            + '<div class="tech-note">Raw softmax scores. All four scores sum to approximately 100%.</div></div>',
+            unsafe_allow_html=True,
+        )
 
         # FEATURE 4 & 5 -- Environment-aware shelf-life
-        st.divider()
-        st.subheader("Estimated Good-Quality Window")
+        st.markdown('<h3 class="section-title">Quality insights</h3>', unsafe_allow_html=True)
 
         shelf_life = estimate_shelf_life(
             predicted_stage=stage,
@@ -520,11 +598,14 @@ def page_analyze():
         else:
             col_sl1, col_sl2 = st.columns(2)
             with col_sl1:
-                st.metric("Estimated window", f"~{shelf_life.display()}")
+                st.markdown(
+                    f'<div class="metric-card"><div class="metric-label">⏳ Prototype shelf life</div><div class="metric-value">~{shelf_life.display()}</div><div class="tech-note">Heuristic estimate</div></div>',
+                    unsafe_allow_html=True,
+                )
             with col_sl2:
-                st.metric(
-                    "Environment",
-                    f"{temperature:.0f} deg C / {humidity:.0f}%"
+                st.markdown(
+                    f'<div class="metric-card"><div class="metric-label">🌡 Environment</div><div class="metric-value">{temperature:.0f}°C · {humidity:.0f}%</div><div class="tech-note">{storage_condition.capitalize()} storage</div></div>',
+                    unsafe_allow_html=True,
                 )
 
             with st.expander("How was this estimated?", expanded=False):
@@ -535,6 +616,16 @@ def page_analyze():
                 )
 
         st.warning(shelf_life.warning)
+
+        with st.expander("Technical details"):
+            st.write({
+                "Model": settings.model_version,
+                "Banana gate": "MobileNetV3-Small",
+                "Input": "224 x 224 RGB",
+                "Processing": "Computer vision",
+                "Input method": input_method.capitalize(),
+                "Banana gate confidence": f"{detection_conf:.1%}",
+            })
 
         # FEATURE 6 -- What-if simulator
         with st.expander("WHAT IF? -- Environment Simulator"):
@@ -1062,8 +1153,23 @@ def page_analytics():
         df = pd.DataFrame(records)
         df["date"] = pd.to_datetime(df["date"], errors="coerce")
 
-        st.subheader("Ripeness Distribution")
         stage_dist = count_by_stage(db)
+        ripe_count = stage_dist.get("ripe", 0)
+        avg_confidence = float(df["confidence"].mean()) if not df.empty else 0.0
+        metric_cols = st.columns(4)
+        for col, label, value in [
+            (metric_cols[0], "Total analyses", total),
+            (metric_cols[1], "Bananas detected", total),
+            (metric_cols[2], "Average AI confidence", f"{avg_confidence:.1%}"),
+            (metric_cols[3], "Ripe", ripe_count),
+        ]:
+            with col:
+                st.markdown(
+                    f'<div class="metric-card"><div class="metric-label">{label}</div><div class="metric-value">{value}</div></div>',
+                    unsafe_allow_html=True,
+                )
+
+        st.subheader("Ripeness Distribution")
         st.bar_chart(stage_dist)
 
         st.subheader("Confidence Distribution")
@@ -1165,7 +1271,7 @@ def page_waste_insights():
 def page_about_ai():
     st.title("About the AI")
 
-    st.markdown("""
+    st.markdown(f"""
 ## Banana Gate Binary Classifier -- TRAINED AI
 
 | Property | Value |
@@ -1174,7 +1280,8 @@ def page_about_ai():
 | Architecture | `BananaGateMobileNetV3` (MobileNetV3-Small transfer learning) |
 | Purpose | Dedicated Gate: Banana vs. Non-Banana |
 | Checkpoint SHA-256 | `a1416daae0ae22080af79436ae8c97b59ebcd301af28fddb8ce19dff5929789d` |
-| Operating Threshold | **0.380** (selected strictly on validation split) |
+| Evaluation operating point | **0.380** (selected strictly on validation split) |
+| Application acceptance threshold | **{settings.banana_gate_threshold:.3f}** (conservative default) |
 | Test Accuracy | **99.67%** (600 held-out test images) |
 | Banana Recall (TPR) | **100.00%** (300/300 bananas accepted) |
 | Non-Banana Rejection (TNR) | **99.33%** (298/300 non-bananas blocked) |

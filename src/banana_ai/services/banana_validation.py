@@ -15,6 +15,7 @@ import enum
 import logging
 import threading
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional
 
 import torch
@@ -108,12 +109,20 @@ def _get_gate_model():
     from banana_ai.config import settings
 
     checkpoint_path = settings.banana_gate_model_path
+    checkpoint_path = Path(checkpoint_path)
+    if not checkpoint_path.is_absolute():
+        checkpoint_path = settings.root_dir / checkpoint_path
     if _gate_model is None:
         with _gate_lock:
             if _gate_model is None:
                 from banana_ai.ml.gate_model import load_gate_model
 
                 model, transform, threshold, meta = load_gate_model(checkpoint_path, device="cpu")
+                if meta.get("class_names") != ["non_banana", "banana"]:
+                    raise RuntimeError(
+                        "Banana gate checkpoint has an invalid class mapping; "
+                        "expected ['non_banana', 'banana']."
+                    )
                 _gate_model = model
                 _gate_transform = transform
                 _gate_threshold = threshold
@@ -294,4 +303,3 @@ def validate_banana_image(image: Image.Image) -> ValidationResult:
 
 
 validate_banana = validate_banana_image
-

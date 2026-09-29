@@ -13,8 +13,12 @@ from banana_ai.services.shelf_life import prototype_estimate
 def load_model(model_path: str):
     device = get_device()
 
+    checkpoint_path = Path(model_path)
+    if not checkpoint_path.is_absolute():
+        checkpoint_path = Path(__file__).resolve().parents[3] / checkpoint_path
+
     checkpoint = torch.load(
-        model_path,
+        checkpoint_path,
         map_location=device,
         weights_only=False,
     )

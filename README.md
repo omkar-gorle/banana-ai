@@ -94,7 +94,10 @@ To eliminate false positive ripeness predictions on non-banana images, the pipel
   - Fruit-Images-Dataset (`Horea94/Fruit-Images-Dataset`, MIT License): 1,300 images across 10 fruit/vegetable classes
   - OpenCV Official Samples (`opencv/opencv`, Apache 2.0 License): 90 images of people/hands, tableware, architecture, objects
   - CIFAR-10 Dataset (Open Academic Research): 1,310 images of animals and vehicles
-- **Validation-selected threshold**: `0.380` (tuned strictly on held-out validation set)
+- **Validation-selected operating point**: `0.380` (tuned strictly on the held-out
+  validation split). The application keeps a more conservative default acceptance
+  threshold of `0.500`; override `BANANA_GATE_THRESHOLD` only after validating
+  the trade-off on representative uploads.
 - **Test Set Accuracy**: **99.67%** (600 held-out images: 300 banana, 300 non-banana)
 - **Banana Recall**: **100.00%** (300 / 300 bananas accepted across all 4 stages)
 - **Non-Banana Rejection**: **99.33%** (298 / 300 non-bananas blocked)

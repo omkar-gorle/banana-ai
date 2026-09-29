@@ -38,6 +38,8 @@ class Settings(BaseSettings):
 
     # Dedicated binary banana-vs-non-banana gate checkpoint and threshold.
     banana_gate_model_path: str = "models/banana_gate_best.pt"
+    # Keep the production high threshold conservative. The gate checkpoint's
+    # evaluation operating point is documented separately from this policy.
     banana_gate_threshold: float = 0.50
     banana_gate_threshold_low: float = 0.25
 

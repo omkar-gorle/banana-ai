@@ -313,6 +313,20 @@ def should_save_prediction(saved_path: Optional[str], current_path: Optional[str
     return bool(current_path) and saved_path != current_path
 
 
+def _clear_prediction_state() -> None:
+    """Clear result state when the user starts a different analysis."""
+    for key in (
+        "prediction",
+        "prediction_path",
+        "prediction_name",
+        "saved_prediction_path",
+        "banana_detection_confidence",
+        "feedback_given",
+        "show_correction",
+    ):
+        st.session_state[key] = None
+
+
 def _get_db():
     """Open a DB session. Returns None if DB unavailable."""
     try:
@@ -469,6 +483,8 @@ def page_analyze():
 
     # Image preview + analyze button
     if active_image_bytes:
+        if active_filename != st.session_state.get("prediction_name"):
+            _clear_prediction_state()
         st.divider()
         col_preview, col_analyze = st.columns([1, 1])
 
@@ -491,11 +507,7 @@ def page_analyze():
 
             if analyze_btn:
                 # Isolate state: clear previous results immediately so rejected images never show stale data
-                st.session_state["prediction"] = None
-                st.session_state["prediction_path"] = None
-                st.session_state["prediction_name"] = None
-                st.session_state["saved_prediction_path"] = None
-                st.session_state["feedback_given"] = False
+                _clear_prediction_state()
 
                 image_path, banana_result = _validate_and_save_temp(
                     active_image_bytes, active_filename

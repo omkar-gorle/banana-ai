@@ -484,10 +484,12 @@ def page_analyze():
     # Image preview + analyze button
     if not active_image_bytes and st.session_state.get("prediction") is not None:
         _clear_prediction_state()
+        st.rerun()
 
     if active_image_bytes:
         if active_filename != st.session_state.get("prediction_name"):
             _clear_prediction_state()
+            st.rerun()
         st.divider()
         col_preview, col_analyze = st.columns([1, 1])
 

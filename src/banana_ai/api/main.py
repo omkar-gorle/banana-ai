@@ -28,6 +28,10 @@ from banana_ai.services.image_validation import (
     ImageValidationError,
     ALLOWED_EXTENSIONS,
 )
+from banana_ai.services.banana_validation import (
+    validate_banana_image,
+    ValidationState,
+)
 
 
 app = FastAPI(
@@ -59,7 +63,7 @@ async def predict_banana(
     file: UploadFile = File(..., description="Banana image (jpg/jpeg/png/webp)"),
     temperature_c: Optional[float] = Query(
         None,
-        description="Ambient temperature in °C (optional, for shelf-life heuristic)",
+        description="Ambient temperature in \u00b0C (optional, for shelf-life heuristic)",
         ge=-20.0,
         le=60.0,
     ),
@@ -77,14 +81,24 @@ async def predict_banana(
 ):
     """Accept a banana image, run the CNN classifier, and return the result.
 
-    If temperature_c and humidity_pct are provided, an environment-aware
-    shelf-life heuristic estimate is included in the response.
+    The request is processed in the following order:
+
+    1. File extension validation
+    2. Model availability check
+    3. Image bytes validation (format, size, dimensions)
+    4. **Banana content validation** -- non-banana images are rejected here
+       with HTTP 400 before the ripeness model is ever invoked.
+    5. Ripeness classification
+    6. Shelf-life estimation
+    7. Database save (optional)
 
     Returns:
+
     - **predicted_stage**: overripe | ripe | rotten | unripe
     - **confidence**: model softmax probability for predicted class
     - **probabilities**: softmax probability for all classes
     - **model_version**: identifier of the model used
+    - **banana_detection_confidence**: score from banana content validator
     - **estimated_days_left**: prototype heuristic display string
     - **estimated_min_days**: lower bound (if environmental inputs provided)
     - **estimated_max_days**: upper bound (if environmental inputs provided)
@@ -117,10 +131,47 @@ async def predict_banana(
     # ---- Read and validate image bytes ----
     content = await file.read()
     try:
-        validate_image_bytes(content, filename=filename)
+        pil_image = validate_image_bytes(content, filename=filename)
     except ImageValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
+    # ---- Banana content validation ----
+    # IMPORTANT: The ripeness model must NEVER be called for non-banana images.
+    # validate_banana_image runs the dedicated Banana Gate binary classifier
+    # (BananaGateMobileNetV3) to confirm banana presence before any ripeness
+    # classification, shelf-life estimation, or database writes.
+    banana_result = validate_banana_image(pil_image)
+
+    if banana_result.state == ValidationState.NOT_BANANA:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "code": "NOT_BANANA",
+                "message": (
+                    "The uploaded image does not appear to contain a banana. "
+                    "Please upload a clear image of a banana."
+                ),
+                "banana_detection_confidence": round(banana_result.confidence, 4),
+                "method": banana_result.method,
+            },
+        )
+
+    if banana_result.state == ValidationState.UNCERTAIN:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "code": "BANANA_UNCERTAIN",
+                "message": (
+                    "Unable to confidently confirm that the image contains a banana. "
+                    "Please provide a clearer image with the banana more prominent and "
+                    "well-lit."
+                ),
+                "banana_detection_confidence": round(banana_result.confidence, 4),
+                "method": banana_result.method,
+            },
+        )
+
+    # ---- Ripeness classification (banana confirmed) ----
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp:
         temp.write(content)
         temp_path = temp.name
@@ -160,11 +211,14 @@ async def predict_banana(
             db_error = str(exc)
 
         response = {
-            # Core ripeness prediction (existing fields — backward compatible)
+            # Core ripeness prediction (existing fields -- backward compatible)
             "predicted_stage": result["stage"],
             "confidence": result["confidence"],
             "probabilities": result["probabilities"],
             "model_version": settings.model_version,
+            # Banana detection metadata
+            "banana_detection_confidence": round(banana_result.confidence, 4),
+            "banana_detection_method": banana_result.method,
             # Shelf-life fields
             "estimated_days_left": shelf_life.display(),
             "estimated_min_days": shelf_life.estimated_min_days,
@@ -177,7 +231,7 @@ async def predict_banana(
         }
         if temperature_c is None and humidity_pct is None:
             response["shelf_life_note"] = (
-                "Environmental inputs not provided — shelf-life estimate used stage-only baseline."
+                "Environmental inputs not provided -- shelf-life estimate used stage-only baseline."
             )
         if prediction_id is not None:
             response["prediction_id"] = prediction_id

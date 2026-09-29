@@ -51,6 +51,11 @@ from banana_ai.services.image_validation import (
     validate_image_bytes,
     safe_temp_filename,
 )
+from banana_ai.services.banana_validation import (
+    validate_banana_image,
+    ValidationResult,
+    ValidationState,
+)
 from banana_ai.services.report import (
     generate_scan_report_html,
     generate_scan_report_csv,
@@ -76,20 +81,32 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .prediction-card {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border-radius: 16px;
-    padding: 24px;
+    background: linear-gradient(135deg, #121829 0%, #1e293b 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    border-radius: 18px;
+    padding: 28px;
     color: white;
     text-align: center;
     margin: 16px 0;
 }
-.stage-ripe    { color: #4caf50; font-size: 2rem; font-weight: 700; }
-.stage-overripe { color: #ff9800; font-size: 2rem; font-weight: 700; }
-.stage-rotten  { color: #f44336; font-size: 2rem; font-weight: 700; }
-.stage-unripe  { color: #2196f3; font-size: 2rem; font-weight: 700; }
+.stage-ripe    { color: #4ade80; font-size: 2.2rem; font-weight: 700; text-shadow: 0 0 20px rgba(74, 222, 128, 0.3); }
+.stage-overripe { color: #fbbf24; font-size: 2.2rem; font-weight: 700; text-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+.stage-rotten  { color: #f87171; font-size: 2.2rem; font-weight: 700; text-shadow: 0 0 20px rgba(248, 113, 113, 0.3); }
+.stage-unripe  { color: #60a5fa; font-size: 2.2rem; font-weight: 700; text-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
+.gate-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-top: 6px;
+}
+.gate-badge-pass { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
+.gate-badge-fail { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); }
 </style>
 """, unsafe_allow_html=True)
 
@@ -153,14 +170,79 @@ _STAGE_EMOJI: dict[str, str] = {
 # ---------------------------------------------------------------------------
 
 
-def _validate_and_save_temp(data: bytes, filename: str) -> Optional[Path]:
-    """Validate image bytes and save to a temp file; return Path or None."""
+def _validate_and_save_temp(
+    data: bytes, filename: str
+) -> tuple[Optional[Path], Optional[ValidationResult]]:
+    """Validate image bytes, run banana content check, save to temp file.
+
+    Returns
+    -------
+    (path, banana_result)
+        path is None when any validation step fails.
+        banana_result is always returned so the caller can inspect state/confidence.
+    """
+    # Step 1 – file / format validation
     try:
         img = validate_image_bytes(data, filename=filename)
     except ImageValidationError as exc:
         st.error(f"Image rejected: {exc}")
-        return None
+        return None, None
 
+    # Step 2 – banana content validation
+    banana_result = validate_banana_image(img)
+
+    if banana_result.state == ValidationState.NOT_BANANA:
+        st.markdown(
+            """
+<div style="background:linear-gradient(135deg, #2b1212 0%, #1a0a0a 100%);border:1px solid #ef5350;border-radius:14px;padding:22px 24px;margin:16px 0;box-shadow:0 8px 24px rgba(239,83,80,0.18)">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+    <span style="font-size:1.8rem">&#9940;</span>
+    <h3 style="color:#ef5350;margin:0;font-size:1.35rem;font-weight:700">Image Blocked by Banana Gate</h3>
+  </div>
+  <p style="color:#ffcdd2;font-size:1.0rem;margin:0 0 10px;line-height:1.5">
+    The dedicated banana gate classifier verified that this image does <strong>not</strong> contain a banana.
+  </p>
+  <div style="background:rgba(255,255,255,0.06);border-left:3px solid #ef5350;border-radius:6px;padding:10px 14px;margin:10px 0;color:#ffcdd2;font-size:0.88rem">
+    &#128737;&#65039; <strong>Pipeline Protection:</strong> Ripeness classification, Grad-CAM visualization, and shelf-life prediction are blocked to protect downstream accuracy.
+  </div>
+  <p style="color:#ffcdd2;margin:10px 0 0;font-size:0.9rem">
+    Please capture or upload a clear photo of a real banana (unripe, ripe, overripe, or rotten).
+  </p>
+  <div style="margin-top:14px;display:flex;align-items:center;gap:8px">
+    <span class="gate-badge gate-badge-fail">Gate Confidence: {conf:.1%}</span>
+    <span style="color:#9e9e9e;font-size:0.8rem">(Threshold: 38.0%)</span>
+  </div>
+</div>""".format(conf=banana_result.confidence),
+            unsafe_allow_html=True,
+        )
+        return None, banana_result
+
+    if banana_result.state == ValidationState.UNCERTAIN:
+        st.markdown(
+            """
+<div style="background:linear-gradient(135deg, #2b1d0a 0%, #1a1205 100%);border:1px solid #ffa726;border-radius:14px;padding:22px 24px;margin:16px 0;box-shadow:0 8px 24px rgba(255,167,38,0.18)">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+    <span style="font-size:1.8rem">&#9888;&#65039;</span>
+    <h3 style="color:#ffa726;margin:0;font-size:1.35rem;font-weight:700">Banana Gate: Ambiguous Content</h3>
+  </div>
+  <p style="color:#ffe0b2;font-size:1.0rem;margin:0 0 10px;line-height:1.5">
+    The image is unclear or the banana is not sufficiently visible for confident gating.
+  </p>
+  <ul style="color:#ffe0b2;margin:6px 0 0 20px;font-size:0.9rem;line-height:1.6">
+    <li>Move the camera closer to the banana</li>
+    <li>Improve ambient lighting and avoid dark shadows</li>
+    <li>Ensure the banana is centered and not obstructed</li>
+  </ul>
+  <div style="margin-top:14px;display:flex;align-items:center;gap:8px">
+    <span class="gate-badge gate-badge-fail" style="background:rgba(255,167,38,0.15);color:#ffa726;border-color:rgba(255,167,38,0.3)">Gate Confidence: {conf:.1%}</span>
+    <span style="color:#9e9e9e;font-size:0.8rem">(Threshold: 38.0%)</span>
+  </div>
+</div>""".format(conf=banana_result.confidence),
+            unsafe_allow_html=True,
+        )
+        return None, banana_result
+
+    # Banana confirmed — save to temp file
     safe_name = safe_temp_filename(filename)
     tmp_dir = Path("reports")
     tmp_dir.mkdir(exist_ok=True)
@@ -171,7 +253,7 @@ def _validate_and_save_temp(data: bytes, filename: str) -> Optional[Path]:
         img.save(img_bytes, format="JPEG")
         f.write(img_bytes.getvalue())
 
-    return tmp_path
+    return tmp_path, banana_result
 
 
 def _run_prediction(image_path: Path):
@@ -351,8 +433,17 @@ def page_analyze():
             )
 
             if analyze_btn:
-                image_path = _validate_and_save_temp(active_image_bytes, active_filename)
-                if image_path:
+                # Isolate state: clear previous results immediately so rejected images never show stale data
+                st.session_state["prediction"] = None
+                st.session_state["prediction_path"] = None
+                st.session_state["prediction_name"] = None
+                st.session_state["saved_prediction_path"] = None
+                st.session_state["feedback_given"] = False
+
+                image_path, banana_result = _validate_and_save_temp(
+                    active_image_bytes, active_filename
+                )
+                if image_path and banana_result:
                     try:
                         result = _run_prediction(image_path)
                         if result:
@@ -362,6 +453,7 @@ def page_analyze():
                             st.session_state["prediction_input_method"] = active_input_method
                             st.session_state["saved_prediction_path"] = None
                             st.session_state["feedback_given"] = False
+                            st.session_state["banana_detection_confidence"] = banana_result.confidence
                     except (OSError, ValueError, RuntimeError) as exc:
                         st.error(f"Could not analyse image: {exc}")
                         logger.exception("Prediction error")
@@ -377,11 +469,15 @@ def page_analyze():
         st.divider()
 
         # FEATURE 2 -- Prediction result card
+        detection_conf = st.session_state.get("banana_detection_confidence", 0.0)
         st.markdown(f"""
         <div class="prediction-card">
             <h2>BANANA ANALYSIS</h2>
             <p class="stage-{stage}">{stage.upper()}</p>
-            <p>Model confidence: <strong>{confidence:.1%}</strong></p>
+            <p>Ripeness confidence: <strong>{confidence:.1%}</strong></p>
+            <p style="font-size:0.85rem;color:#a5d6a7">
+                &#127820; Banana detection: <strong>{detection_conf:.0%}</strong>
+            </p>
             <p style="font-size:0.8rem;opacity:0.7">
                 Model: {settings.model_version} | Input: {input_method.capitalize()}
             </p>
@@ -653,6 +749,35 @@ def page_batch():
                         try:
                             data = bf.getvalue()
                             img = validate_image_bytes(data, filename=bf.name)
+
+                            # --- Banana content gate ---
+                            banana_res = validate_banana_image(img)
+                            if banana_res.state == ValidationState.NOT_BANANA:
+                                batch_results.append({
+                                    "filename": bf.name,
+                                    "stage": "rejected",
+                                    "confidence": 0,
+                                    "probabilities": {},
+                                    "estimated_days_left": "N/A",
+                                    "error": "Not a banana image",
+                                    "banana_detection_confidence": banana_res.confidence,
+                                    "banana_state": "NOT_BANANA",
+                                })
+                                continue
+                            if banana_res.state == ValidationState.UNCERTAIN:
+                                batch_results.append({
+                                    "filename": bf.name,
+                                    "stage": "uncertain",
+                                    "confidence": 0,
+                                    "probabilities": {},
+                                    "estimated_days_left": "N/A",
+                                    "error": "Banana detection uncertain",
+                                    "banana_detection_confidence": banana_res.confidence,
+                                    "banana_state": "UNCERTAIN",
+                                })
+                                continue
+                            # --- banana confirmed ---
+
                             tmp_name = safe_temp_filename(bf.name)
                             tmp_dir = Path("reports")
                             tmp_dir.mkdir(exist_ok=True)
@@ -669,6 +794,8 @@ def page_batch():
                             )
                             result["filename"] = bf.name
                             result["estimated_days_left"] = sl.display()
+                            result["banana_detection_confidence"] = banana_res.confidence
+                            result["banana_state"] = "BANANA"
                             batch_results.append(result)
                             tmp_path.unlink(missing_ok=True)
                         except ImageValidationError as exc:
@@ -699,7 +826,9 @@ def page_batch():
 
             batch_results = st.session_state.get("batch_results", [])
             if batch_results:
-                valid = [r for r in batch_results if r["stage"] != "error"]
+                valid = [r for r in batch_results if r["stage"] not in {"error", "rejected", "uncertain"}]
+                rejected = [r for r in batch_results if r["stage"] == "rejected"]
+                uncertain = [r for r in batch_results if r["stage"] == "uncertain"]
                 errors = [r for r in batch_results if r["stage"] == "error"]
 
                 stage_counts: dict[str, int] = {}
@@ -707,27 +836,58 @@ def page_batch():
                     stage_counts[r["stage"]] = stage_counts.get(r["stage"], 0) + 1
 
                 st.subheader("Batch Summary")
-                sc1, sc2, sc3, sc4, sc5 = st.columns(5)
+                sc1, sc2, sc3, sc4, sc5, sc6, sc7 = st.columns(7)
                 sc1.metric("Total", len(batch_files))
                 sc2.metric("Unripe", stage_counts.get("unripe", 0))
                 sc3.metric("Ripe", stage_counts.get("ripe", 0))
                 sc4.metric("Overripe", stage_counts.get("overripe", 0))
                 sc5.metric("Rotten", stage_counts.get("rotten", 0))
+                sc6.metric("Rejected", len(rejected))
+                sc7.metric("Uncertain", len(uncertain))
+
+                if rejected or uncertain:
+                    st.info(
+                        f"{len(rejected)} image(s) rejected (not a banana). "
+                        f"{len(uncertain)} image(s) uncertain (banana not confirmed)."
+                    )
 
                 if errors:
                     st.warning(f"{len(errors)} file(s) could not be processed.")
 
                 st.subheader("Individual Results")
                 import pandas as pd
+
+                # Show valid (banana) predictions
                 rows = [
                     {
                         "Filename": r["filename"],
                         "Stage": r["stage"].capitalize(),
-                        "Confidence": f"{r['confidence']:.1%}",
+                        "Ripeness Confidence": f"{r['confidence']:.1%}",
+                        "Banana Detection": f"{r.get('banana_detection_confidence', 0):.0%}",
                         "Est. Window": r["estimated_days_left"],
+                        "Status": "OK",
                     }
                     for r in valid
                 ]
+                # Show rejected/uncertain in the same table
+                for r in rejected:
+                    rows.append({
+                        "Filename": r["filename"],
+                        "Stage": "Rejected",
+                        "Ripeness Confidence": "N/A",
+                        "Banana Detection": f"{r.get('banana_detection_confidence', 0):.0%}",
+                        "Est. Window": "N/A",
+                        "Status": "Image rejected (not a banana)",
+                    })
+                for r in uncertain:
+                    rows.append({
+                        "Filename": r["filename"],
+                        "Stage": "Uncertain",
+                        "Ripeness Confidence": "N/A",
+                        "Banana Detection": f"{r.get('banana_detection_confidence', 0):.0%}",
+                        "Est. Window": "N/A",
+                        "Status": "Banana detection uncertain",
+                    })
                 if rows:
                     st.dataframe(pd.DataFrame(rows), use_container_width=True)
 
@@ -748,6 +908,7 @@ def page_batch():
                         try:
                             from banana_ai.db.crud import save_prediction as db_save
                             saved = 0
+                            # Only save confirmed banana predictions
                             for r in valid:
                                 sl = estimate_shelf_life(
                                     r["stage"], temperature, humidity, storage_condition
@@ -768,7 +929,11 @@ def page_batch():
                                     shelf_life_method=sl.method,
                                 )
                                 saved += 1
-                            st.success(f"{saved} batch results saved to database.")
+                            skipped = len(rejected) + len(uncertain)
+                            msg = f"{saved} banana result(s) saved to database."
+                            if skipped:
+                                msg += f" {skipped} rejected/uncertain image(s) not saved."
+                            st.success(msg)
                         except Exception as exc:
                             st.warning(f"Could not save batch: {exc}")
                         finally:
@@ -1001,6 +1166,25 @@ def page_about_ai():
     st.title("About the AI")
 
     st.markdown("""
+## Banana Gate Binary Classifier -- TRAINED AI
+
+| Property | Value |
+|---|---|
+| Model Checkpoint | `models/banana_gate_best.pt` |
+| Architecture | `BananaGateMobileNetV3` (MobileNetV3-Small transfer learning) |
+| Purpose | Dedicated Gate: Banana vs. Non-Banana |
+| Checkpoint SHA-256 | `a1416daae0ae22080af79436ae8c97b59ebcd301af28fddb8ce19dff5929789d` |
+| Operating Threshold | **0.380** (selected strictly on validation split) |
+| Test Accuracy | **99.67%** (600 held-out test images) |
+| Banana Recall (TPR) | **100.00%** (300/300 bananas accepted) |
+| Non-Banana Rejection (TNR) | **99.33%** (298/300 non-bananas blocked) |
+| Test F1 Score | **0.9967** |
+| Inference Latency | **< 15ms** on CPU |
+
+> The gate stops non-banana inputs immediately. Non-banana images never reach the ripeness CNN (`banana_cnn_v2.pt`), Grad-CAM, shelf-life estimation, or database prediction storage.
+
+---
+
 ## Banana Ripeness Classifier -- TRAINED AI
 
 | Property | Value |

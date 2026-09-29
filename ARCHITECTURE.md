@@ -12,33 +12,47 @@
               |                         |
               +----------+--------------+
                          |
-                 Prediction Service
-                  (ml/predict.py)
+           Image File Validation (MIME, size, bounds)
                          |
-               +----+----+----+
-               |              |
-         Preprocessing      Grad-CAM
-         (224×224, norm)   (ml/explainability.py)
-               |
-           BananaCNN
-           (ml/model.py)
-           422,788 params
-           Trained from scratch
-               |
-        Softmax Probabilities
-               |
-       +---------+----------+
-       |                    |
- PostgreSQL            Shelf-life
- (observations +       prototype
-  predictions)        (heuristic only)
+                 BANANA GATE CLASSIFIER
+                 (BananaGateMobileNetV3)
+                 models/banana_gate_best.pt
+                 Threshold = 0.380
+                 Latency < 15ms
+                /              \
+         [NON-BANANA]       [BANANA]
+              ↓                 ↓
+        STOP & REJECT     Prediction Service
+     (No ripeness,       (ml/predict.py)
+      No Grad-CAM,              |
+      No shelf-life,      +-----+-----+
+      No DB save)         |           |
+                    Preprocessing   Grad-CAM
+                    (224×224)      (ml/explainability.py)
+                          |
+                     BananaCNN V2 (FROZEN)
+                     (ml/model.py)
+                     models/banana_cnn_v2.pt
+                     SHA-256: cf053a10...
+                          |
+                    Softmax Probabilities
+                    (overripe, ripe, rotten, unripe)
+                          |
+                   +------+------+
+                   |             |
+              PostgreSQL     Shelf-life
+              (saved ONLY    prototype
+               by user)      (heuristic only)
 ```
 
 ## Component Map
 
 | Component | File | Purpose |
 |-----------|------|---------|
-| CNN model | `src/banana_ai/ml/model.py` | 4-class ripeness classifier |
+| Banana Gate Model | `src/banana_ai/ml/gate_model.py` | Binary banana vs non-banana classifier (`BananaGateMobileNetV3`) |
+| Banana Gate Training | `src/banana_ai/ml/train_banana_gate.py` | Fast cached feature training and threshold selection |
+| Banana Gate Validator | `src/banana_ai/services/banana_validation.py` | Production gating service (`validate_banana_image`) |
+| Ripeness CNN model | `src/banana_ai/ml/model.py` | 4-class ripeness classifier (`banana_cnn_v2.pt` FROZEN) |
 | Data loading | `src/banana_ai/ml/data.py` | Train/val/test loaders |
 | V1 training | `src/banana_ai/ml/train.py` | Baseline training |
 | V2 training | `src/banana_ai/ml/train_v2.py` | Class-weight experiment |
@@ -54,8 +68,8 @@
 | DB session | `src/banana_ai/db/session.py` | Connection pool |
 | DB CRUD | `src/banana_ai/db/crud.py` | Save/query predictions |
 | DB init | `src/banana_ai/db/init_db.py` | Create tables |
-| FastAPI | `src/banana_ai/api/main.py` | REST API |
-| Streamlit | `src/banana_ai/app.py` | Web UI |
+| FastAPI | `src/banana_ai/api/main.py` | REST API with gate enforcement |
+| Streamlit | `src/banana_ai/app.py` | Web UI with dual inputs and gate status cards |
 | Config | `src/banana_ai/config.py` | Pydantic settings |
 
 ## BananaCNN Architecture

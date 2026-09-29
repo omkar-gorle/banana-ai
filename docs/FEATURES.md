@@ -8,6 +8,21 @@ Banana AI is a **Banana Quality & Shelf-Life Intelligence System** built around 
 
 ## Features
 
+### Feature 0 — Dedicated Banana vs. Non-Banana Gate Classifier
+
+A lightweight, dedicated neural network gate (`BananaGateMobileNetV3`) guards the production pipeline against non-banana images:
+
+- **Model**: `models/banana_gate_best.pt`
+- **Architecture**: MobileNetV3-Small transfer learning with custom binary classifier head
+- **Operating Threshold**: `0.380` (selected strictly on validation data to maximize recall and specificity)
+- **Held-Out Test Accuracy**: `99.67%` (300 banana, 300 non-banana)
+- **Banana Recall**: `100.00%` (0 false negatives across unripe, ripe, overripe, and rotten stages)
+- **Non-Banana Rejection Rate**: `99.33%` (298/300 non-banana items blocked)
+- **Inference Speed**: `< 15ms` on CPU
+- **Strict Downstream Invariant**: Any rejected image immediately stops at the gate. It is NEVER passed to the frozen ripeness model (`models/banana_cnn_v2.pt`), Grad-CAM visualizer, shelf-life estimator, or PostgreSQL database.
+
+---
+
 ### Feature 1 — Dual Image Input
 
 The UI provides two input methods, always both available:

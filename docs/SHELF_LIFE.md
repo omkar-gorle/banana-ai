@@ -14,6 +14,7 @@ It **IS**:
 - A simple bounded linear formula using prototype coefficients
 - Transparent and deterministic (same inputs → same output)
 - Clearly labeled throughout the UI and API
+- **Strictly protected by the Banana Gate**: Non-banana images are rejected upstream by `BananaGateMobileNetV3`, ensuring shelf-life estimation is only executed for verified bananas.
 
 ---
 

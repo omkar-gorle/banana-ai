@@ -83,6 +83,47 @@ Class weights applied in V2: overripe=1.255, ripe=0.837, rotten=0.733, unripe=1.
 
 ---
 
+## Banana Gate Binary Classifier (Production Input Guard)
+
+To eliminate false positive ripeness predictions on non-banana images, the pipeline utilizes a dedicated binary gate model:
+
+- **Checkpoint**: `models/banana_gate_best.pt`
+- **Architecture**: `BananaGateMobileNetV3` (MobileNetV3-Small backbone with custom classifier head)
+- **Classes**: `non_banana` (0), `banana` (1)
+- **Negative Training Sources (2,700 images)**:
+  - Fruit-Images-Dataset (`Horea94/Fruit-Images-Dataset`, MIT License): 1,300 images across 10 fruit/vegetable classes
+  - OpenCV Official Samples (`opencv/opencv`, Apache 2.0 License): 90 images of people/hands, tableware, architecture, objects
+  - CIFAR-10 Dataset (Open Academic Research): 1,310 images of animals and vehicles
+- **Validation-selected threshold**: `0.380` (tuned strictly on held-out validation set)
+- **Test Set Accuracy**: **99.67%** (600 held-out images: 300 banana, 300 non-banana)
+- **Banana Recall**: **100.00%** (300 / 300 bananas accepted across all 4 stages)
+- **Non-Banana Rejection**: **99.33%** (298 / 300 non-bananas blocked)
+- **Inference Latency**: **< 15ms** on CPU
+
+```text
+Camera / Upload / Batch
+       ↓
+Image File Validation (MIME / size / dimensions)
+       ↓
+  BANANA GATE (BananaGateMobileNetV3, threshold = 0.38)
+   /          \
+[Banana]    [Non-Banana]
+   ↓             ↓
+banana_cnn_v2  REJECT & STOP
+   ↓          (No ripeness, No Grad-CAM, No shelf-life, No DB record)
+Ripeness
+   ↓
+Grad-CAM
+   ↓
+Shelf-life
+   ↓
+Save / Analytics
+```
+
+**Frozen Ripeness Model Invariant**: The production ripeness model (`models/banana_cnn_v2.pt`) remains completely frozen and immutable (SHA-256: `cf053a109c32f30ec50d007712dc0dde7be0c47375d3c708f14483f3b1a8869d`). Non-banana images are stopped dead at the gate and never reach `banana_cnn_v2.pt`.
+
+---
+
 ## Hardware
 
 ```text

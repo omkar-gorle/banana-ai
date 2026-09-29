@@ -487,7 +487,10 @@ def page_analyze():
         st.rerun()
 
     if active_image_bytes:
-        if active_filename != st.session_state.get("prediction_name"):
+        if (
+            st.session_state.get("prediction") is not None
+            and active_filename != st.session_state.get("prediction_name")
+        ):
             _clear_prediction_state()
             st.rerun()
         st.divider()

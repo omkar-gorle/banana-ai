@@ -12,6 +12,7 @@ models/*.pth
 # Production inference checkpoints are required by the deployed Streamlit app.
 !models/banana_cnn_v2.pt
 !models/banana_cnn_best.pt
+!models/banana_gate_best.pt
 reports/v1/
 reports/v2/
 reports/explainability/
@@ -27,6 +28,12 @@ data/train/*
 data/test/*
 data/val/*
 data/longitudinal/*
+data/banana_gate/*
+data/banana_gate_small/
+data/cifar100_negative/
+data/cifar10_negative/
+data/gate_features_cache.pt
+data/gate_negatives_cache/
 
 # Keep folder structure
 !data/train/.gitkeep

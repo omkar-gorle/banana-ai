@@ -1,0 +1,52 @@
+{
+  "model_architecture": "BananaGateMobileNetV3",
+  "checkpoint_path": "models/banana_gate_best.pt",
+  "checkpoint_sha256": "a1416daae0ae22080af79436ae8c97b59ebcd301af28fddb8ce19dff5929789d",
+  "frozen_ripeness_sha256": "cf053a109c32f30ec50d007712dc0dde7be0c47375d3c708f14483f3b1a8869d",
+  "selected_threshold": 0.38,
+  "threshold_selection_data": "validation_set_only",
+  "validation_metrics": {
+    "accuracy": 0.99875,
+    "precision": 0.9975062344139651,
+    "recall": 1.0,
+    "banana_recall": 1.0,
+    "f1": 0.9987515605493134,
+    "specificity": 0.9975,
+    "non_banana_rejection_rate": 0.9975,
+    "roc_auc": 1.0,
+    "fpr": 0.0025,
+    "fnr": 0.0,
+    "tp": 400,
+    "tn": 399,
+    "fp": 1,
+    "fn": 0,
+    "confusion_matrix": {
+      "tn": 399,
+      "fp": 1,
+      "fn": 0,
+      "tp": 400
+    }
+  },
+  "test_metrics": {
+    "accuracy": 0.9966666666666667,
+    "precision": 0.9933774834437086,
+    "recall": 1.0,
+    "banana_recall": 1.0,
+    "f1": 0.9966777408637874,
+    "specificity": 0.9933333333333333,
+    "non_banana_rejection_rate": 0.9933333333333333,
+    "roc_auc": 1.0,
+    "fpr": 0.006666666666666667,
+    "fnr": 0.0,
+    "tp": 300,
+    "tn": 298,
+    "fp": 2,
+    "fn": 0,
+    "confusion_matrix": {
+      "tn": 298,
+      "fp": 2,
+      "fn": 0,
+      "tp": 300
+    }
+  }
+}

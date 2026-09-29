@@ -20,6 +20,27 @@ class Settings(BaseSettings):
     image_size: int = 224
     dataset_root: str = "data"
 
+    # ---------------------------------------------------------------------------
+    # Banana content validation thresholds
+    # ---------------------------------------------------------------------------
+    # These are application-level thresholds and are NOT scientifically optimal.
+    # Tune them using real banana and non-banana test images.
+    #
+    #   score >= banana_detection_threshold_high  →  BANANA   (proceed to ripeness)
+    #   score <= banana_detection_threshold_low   →  NOT_BANANA (reject)
+    #   between the two                           →  UNCERTAIN  (reject, ask for clearer image)
+    #
+    # Override via environment variables:
+    #   BANANA_DETECTION_THRESHOLD_HIGH=0.60
+    #   BANANA_DETECTION_THRESHOLD_LOW=0.25
+    banana_detection_threshold_high: float = 0.60
+    banana_detection_threshold_low: float = 0.25
+
+    # Dedicated binary banana-vs-non-banana gate checkpoint and threshold.
+    banana_gate_model_path: str = "models/banana_gate_best.pt"
+    banana_gate_threshold: float = 0.50
+    banana_gate_threshold_low: float = 0.25
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_prefix="",

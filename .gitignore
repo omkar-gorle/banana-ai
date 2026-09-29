@@ -13,6 +13,8 @@ models/*.pth
 !models/banana_cnn_v2.pt
 !models/banana_cnn_best.pt
 !models/banana_gate_best.pt
+!models/banana_gate_v1.pt
+!models/banana_gate_v2.pt
 reports/v1/
 reports/v2/
 reports/explainability/

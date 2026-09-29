@@ -87,20 +87,22 @@ Class weights applied in V2: overripe=1.255, ripe=0.837, rotten=0.733, unripe=1.
 
 To eliminate false positive ripeness predictions on non-banana images, the pipeline utilizes a dedicated binary gate model:
 
-- **Checkpoint**: `models/banana_gate_best.pt`
+- **Checkpoint**: `models/banana_gate_best.pt` (v2; previous checkpoint retained as `models/banana_gate_v1.pt`)
 - **Architecture**: `BananaGateMobileNetV3` (MobileNetV3-Small backbone with custom classifier head)
 - **Classes**: `non_banana` (0), `banana` (1)
-- **Negative Training Sources (2,700 images)**:
+- **Negative Training Sources**:
   - Fruit-Images-Dataset (`Horea94/Fruit-Images-Dataset`, MIT License): 1,300 images across 10 fruit/vegetable classes
   - OpenCV Official Samples (`opencv/opencv`, Apache 2.0 License): 90 images of people/hands, tableware, architecture, objects
   - CIFAR-10 Dataset (Open Academic Research): 1,310 images of animals and vehicles
-- **Validation-selected operating point**: `0.380` (tuned strictly on the held-out
-  validation split). The application keeps a more conservative default acceptance
-  threshold of `0.500`; override `BANANA_GATE_THRESHOLD` only after validating
-  the trade-off on representative uploads.
-- **Test Set Accuracy**: **99.67%** (600 held-out images: 300 banana, 300 non-banana)
-- **Banana Recall**: **100.00%** (300 / 300 bananas accepted across all 4 stages)
-- **Non-Banana Rejection**: **99.33%** (298 / 300 non-bananas blocked)
+- **Hard-negative augmentation**: HaGRIDv2 `no_gesture` (CC BY 4.0), with
+  2,164 hand-negative images evaluated and a deterministic train/validation/test
+  split.
+- **Checkpoint validation operating point**: `0.350`. The application keeps the
+  established `0.500` BANANA/UNCERTAIN boundary; v2 rejects all held-out
+  HaGRIDv2 hand negatives at that production threshold.
+- **Combined held-out Accuracy**: **99.89%** (300 banana, 624 non-banana)
+- **Banana Recall**: **100.00%** (300 / 300 bananas accepted)
+- **Non-Banana Rejection**: **99.84%** (623 / 624 non-bananas blocked)
 - **Inference Latency**: **< 15ms** on CPU
 
 ```text

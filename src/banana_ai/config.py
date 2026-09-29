@@ -38,8 +38,9 @@ class Settings(BaseSettings):
 
     # Dedicated binary banana-vs-non-banana gate checkpoint and threshold.
     banana_gate_model_path: str = "models/banana_gate_best.pt"
-    # Keep the production high threshold conservative. The gate checkpoint's
-    # evaluation operating point is documented separately from this policy.
+    # Keep the application policy at 0.50 to preserve the existing
+    # BANANA/UNCERTAIN boundary. The v2 checkpoint also rejects all held-out
+    # HaGRIDv2 hand negatives at this policy threshold.
     banana_gate_threshold: float = 0.50
     banana_gate_threshold_low: float = 0.25
 

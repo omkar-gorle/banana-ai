@@ -482,6 +482,9 @@ def page_analyze():
         st.markdown("</div>", unsafe_allow_html=True)
 
     # Image preview + analyze button
+    if not active_image_bytes and st.session_state.get("prediction") is not None:
+        _clear_prediction_state()
+
     if active_image_bytes:
         if active_filename != st.session_state.get("prediction_name"):
             _clear_prediction_state()

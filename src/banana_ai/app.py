@@ -143,6 +143,54 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 }
 .gate-badge-pass { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
 .gate-badge-fail { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); }
+
+/* Neo-brutalist visual system */
+:root { --nb-yellow:#FFD84D; --nb-green:#8BC34A; --nb-deep:#163A24; --nb-coral:#FF6B5A; --nb-cream:#FFF8E7; --nb-paper:#F7F3E8; --nb-ink:#111111; }
+html, body, [class*="css"] { font-family: 'Space Grotesk', 'Inter', sans-serif; }
+body, .stApp { background: var(--nb-cream); color: var(--nb-ink); }
+.stApp { background-image: radial-gradient(#111111 0.7px, transparent 0.7px); background-size: 18px 18px; background-color: var(--nb-cream); }
+.block-container { max-width: 1240px; padding-top: 1.25rem; padding-bottom: 5rem; }
+[data-testid="stSidebar"] { background: var(--nb-paper); border-right: 3px solid var(--nb-ink); }
+[data-testid="stSidebar"] > div:first-child { padding-top: 1.2rem; }
+[data-testid="stSidebar"] h2 { background: var(--nb-yellow); border: 3px solid var(--nb-ink); box-shadow: 5px 5px 0 var(--nb-ink); padding: 14px; font-weight: 900; }
+[data-testid="stSidebar"] .stRadio label { border: 3px solid var(--nb-ink); background: var(--nb-paper); color: var(--nb-ink); padding: 8px 10px; margin: 5px 0; font-weight: 800; }
+[data-testid="stSidebar"] .stRadio label:has(input:checked) { background: var(--nb-yellow); box-shadow: 4px 4px 0 var(--nb-ink); }
+.hero { background: var(--nb-yellow); color: var(--nb-ink); border: 4px solid var(--nb-ink); border-radius: 0; padding: clamp(28px, 5vw, 58px); margin-bottom: 24px; box-shadow: 10px 10px 0 var(--nb-ink); position: relative; overflow: hidden; }
+.hero:after { content:"🍌  ✦  +  →"; position:absolute; right:3%; bottom:9%; font-size:clamp(1.5rem,4vw,3.2rem); letter-spacing:.2em; transform:rotate(-7deg); }
+.hero-kicker { color: var(--nb-ink); font-size: .82rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.hero h1 { color: var(--nb-ink); font-size: clamp(2.6rem, 8vw, 6.2rem); font-weight: 900; letter-spacing: -.07em; line-height: .9; max-width: 760px; text-transform: uppercase; margin: 16px 0 20px; }
+.hero p { color: var(--nb-ink); font-size: 1.05rem; font-weight: 600; max-width: 620px; margin-bottom: 22px; }
+.online-badge { display: inline-block; color: var(--nb-ink); background: var(--nb-green); border: 3px solid var(--nb-ink); border-radius: 0; padding: 8px 13px; font-size: .78rem; font-weight: 900; box-shadow: 4px 4px 0 var(--nb-ink); }
+.step-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin: 18px 0 30px; }
+.step { min-height:94px; background: var(--nb-paper); border:3px solid var(--nb-ink); border-radius:0; padding:14px; color:var(--nb-ink); font-size:.82rem; font-weight:600; box-shadow:5px 5px 0 var(--nb-ink); }
+.step:nth-child(2) { background:var(--nb-green); }.step:nth-child(3) { background:#f2c94c; }.step:nth-child(4) { background:#fff; }
+.step strong { display:block; color:var(--nb-ink); font-size:1rem; font-weight:900; margin-bottom:8px; }
+.input-card, .result-panel, .metric-card { background:var(--nb-paper); border:3px solid var(--nb-ink); border-radius:0; box-shadow:6px 6px 0 var(--nb-ink); }
+.input-card { padding:24px; }.input-card h2, .section-title { color:var(--nb-ink); font-weight:900; text-transform:uppercase; letter-spacing:-.03em; }
+.eyebrow, .result-label, .metric-card .metric-label { color:var(--nb-deep); font-weight:900; letter-spacing:.12em; }
+.empty-state { background:var(--nb-paper); border:3px dashed var(--nb-ink); border-radius:0; box-shadow:6px 6px 0 var(--nb-ink); color:var(--nb-ink); padding:38px 18px; }
+.empty-icon { font-size:3rem; }
+.tech-note, .stCaption, [data-testid="stCaptionContainer"] { color:#384438; font-weight:600; }
+.result-panel { padding:26px; height:100%; }
+.result-stage { font-size:clamp(3.2rem, 9vw, 7rem); font-weight:900; letter-spacing:-.08em; text-shadow:4px 4px 0 var(--nb-ink); }
+.stage-ripe { color:var(--nb-yellow); }.stage-unripe { color:var(--nb-green); }.stage-overripe { color:#f29f38; }.stage-rotten { color:var(--nb-coral); }
+.confidence-track, .prob-track { background:#fff; border:3px solid var(--nb-ink); border-radius:0; height:18px; margin:14px 0 8px; }
+.confidence-fill, .prob-fill { background:var(--nb-green); border-radius:0; height:100%; }
+.metric-card { padding:16px; }.metric-card .metric-value { color:var(--nb-ink); font-size:1.8rem; font-weight:900; }
+.prob-row { margin:14px 0; }.prob-head { color:var(--nb-ink); font-weight:900; text-transform:uppercase; }
+.stButton > button, .stDownloadButton > button { background:var(--nb-yellow); color:var(--nb-ink); border:3px solid var(--nb-ink); border-radius:0; box-shadow:5px 5px 0 var(--nb-ink); font-weight:900; min-height:2.8rem; text-transform:uppercase; letter-spacing:.02em; transition:transform .12s, box-shadow .12s; }
+.stButton > button:hover, .stDownloadButton > button:hover { background:var(--nb-green); color:var(--nb-ink); transform:translate(2px,2px); box-shadow:3px 3px 0 var(--nb-ink); }
+.stButton > button:active, .stDownloadButton > button:active { transform:translate(5px,5px); box-shadow:0 0 0 var(--nb-ink); }
+.stTabs [data-baseweb="tab-list"] { gap:10px; }.stTabs [data-baseweb="tab"] { border:3px solid var(--nb-ink); background:var(--nb-paper); color:var(--nb-ink); border-radius:0; font-weight:900; padding:10px 18px; }.stTabs [aria-selected="true"] { background:var(--nb-yellow); box-shadow:4px 4px 0 var(--nb-ink); }
+[data-testid="stMetric"] { background:var(--nb-yellow); border:3px solid var(--nb-ink); box-shadow:5px 5px 0 var(--nb-ink); padding:12px; }
+[data-testid="stMetricLabel"], [data-testid="stMetricValue"] { color:var(--nb-ink); font-weight:900; }
+[data-testid="stDataFrame"], .stAlert, [data-testid="stExpander"] { border:3px solid var(--nb-ink); border-radius:0; box-shadow:5px 5px 0 var(--nb-ink); background:var(--nb-paper); }
+.stAlert { color:var(--nb-ink); font-weight:700; }
+.gate-rejection { background:var(--nb-coral) !important; border:4px solid var(--nb-ink) !important; border-radius:0 !important; box-shadow:8px 8px 0 var(--nb-ink) !important; color:var(--nb-ink) !important; }
+.gate-rejection h3, .gate-rejection p, .gate-rejection strong, .gate-rejection div, .gate-rejection span { color:var(--nb-ink) !important; }
+hr { border-color:var(--nb-ink); border-width:2px 0 0; opacity:1; }
+@media (max-width: 800px) { .step-strip { grid-template-columns:repeat(2,1fr); } .hero h1 { font-size:clamp(2.6rem,13vw,5rem); } .hero:after { opacity:.5; } }
+@media (max-width: 520px) { .step-strip { grid-template-columns:1fr; } .block-container { padding-left:1rem; padding-right:1rem; } .hero { padding:26px 20px; box-shadow:7px 7px 0 var(--nb-ink); } .hero h1 { font-size:3.2rem; } }
 </style>
 """, unsafe_allow_html=True)
 
@@ -230,16 +278,16 @@ def _validate_and_save_temp(
     if banana_result.state == ValidationState.NOT_BANANA:
         st.markdown(
             """
-<div style="background:linear-gradient(135deg, #2b1212 0%, #1a0a0a 100%);border:1px solid #ef5350;border-radius:14px;padding:22px 24px;margin:16px 0;box-shadow:0 8px 24px rgba(239,83,80,0.18)">
+<div class="gate-rejection" style="background:linear-gradient(135deg, #2b1212 0%, #1a0a0a 100%);border:1px solid #ef5350;border-radius:14px;padding:22px 24px;margin:16px 0;box-shadow:0 8px 24px rgba(239,83,80,0.18)">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
     <span style="font-size:1.8rem">&#9940;</span>
-    <h3 style="color:#ef5350;margin:0;font-size:1.35rem;font-weight:700">Image Blocked by Banana Gate</h3>
+    <h3 style="color:#ef5350;margin:0;font-size:1.35rem;font-weight:700">✕ NOT A BANANA</h3>
   </div>
   <p style="color:#ffcdd2;font-size:1.0rem;margin:0 0 10px;line-height:1.5">
-    The dedicated banana gate classifier verified that this image does <strong>not</strong> contain a banana.
+    Please capture a clear image of a banana.
   </p>
   <div style="background:rgba(255,255,255,0.06);border-left:3px solid #ef5350;border-radius:6px;padding:10px 14px;margin:10px 0;color:#ffcdd2;font-size:0.88rem">
-    &#128737;&#65039; <strong>Pipeline Protection:</strong> Ripeness classification, Grad-CAM visualization, and shelf-life prediction are blocked to protect downstream accuracy.
+    &#128737;&#65039; <strong>V2 ANALYSIS SKIPPED:</strong> Ripeness, Grad-CAM, shelf-life, and persistence are blocked.
   </div>
   <p style="color:#ffcdd2;margin:10px 0 0;font-size:0.9rem">
     Please capture or upload a clear photo of a real banana (unripe, ripe, overripe, or rotten).
@@ -364,7 +412,8 @@ def _save_feedback_to_db(feedback: str, corrected_stage: Optional[str]) -> None:
 # ---------------------------------------------------------------------------
 
 with st.sidebar:
-    st.markdown("## 🍌 Banana AI")
+    st.markdown("## 🍌 BANANA AI")
+    st.caption("COMPUTER VISION LAB")
     st.caption("Smart vision for banana quality")
     st.divider()
 
@@ -420,16 +469,16 @@ def page_analyze():
     st.markdown(
         """
         <section class="hero">
-          <div class="hero-kicker">🍌 Banana AI · Computer Vision</div>
-          <h1>Smart vision for banana quality.</h1>
-          <p>Analyze ripeness, understand the result, and estimate a quality window with an explainable AI workflow.</p>
+          <div class="hero-kicker">🍌 BANANA AI · COMPUTER VISION LAB</div>
+          <h1>Smart vision<br>for banana<br>quality.</h1>
+          <p>Detect ripeness. Understand the prediction. Estimate a quality window with an explainable AI workflow.</p>
           <span class="online-badge">● AI SYSTEM ONLINE</span>
         </section>
         <div class="step-strip">
-          <div class="step step-active"><strong>1 · Capture</strong>Upload or take a photo.</div>
-          <div class="step"><strong>2 · Validate</strong>Banana gate checks the image.</div>
-          <div class="step"><strong>3 · Analyze</strong>Ripeness model classifies it.</div>
-          <div class="step"><strong>4 · Insights</strong>Explanation and shelf-life.</div>
+          <div class="step step-active"><strong>01 · CAPTURE</strong>Upload or take a photo.</div>
+          <div class="step"><strong>02 · BANANA GATE</strong>Reject visual impostors.</div>
+          <div class="step"><strong>03 · V2 ANALYSIS</strong>Classify ripeness.</div>
+          <div class="step"><strong>04 · INSIGHTS</strong>Explain and estimate.</div>
         </div>
         """,
         unsafe_allow_html=True,

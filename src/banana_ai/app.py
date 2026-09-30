@@ -662,29 +662,53 @@ def page_analyze():
             storage_condition=storage_condition,
         )
 
+        uncertain_flag = confidence < 0.60
+        uncertain_text = "<br>⚠ Low-confidence estimate" if uncertain_flag else ""
+
         if stage == "rotten":
-            st.error("Stage is rotten -- no quality window estimated.")
+            sl_display = "0 DAYS"
+            sl_subtitle = "NOT RECOMMENDED"
+            bg_color = "var(--nb-coral)"
         else:
-            col_sl1, col_sl2 = st.columns(2)
-            with col_sl1:
-                st.markdown(
-                    f'<div class="metric-card"><div class="metric-label">⏳ Prototype shelf life</div><div class="metric-value">~{shelf_life.display()}</div><div class="tech-note">Heuristic estimate</div></div>',
-                    unsafe_allow_html=True,
-                )
-            with col_sl2:
-                st.markdown(
-                    f'<div class="metric-card"><div class="metric-label">🌡 Environment</div><div class="metric-value">{temperature:.0f}°C · {humidity:.0f}%</div><div class="tech-note">{storage_condition.capitalize()} storage</div></div>',
-                    unsafe_allow_html=True,
-                )
+            sl_display = shelf_life.display().upper()
+            if uncertain_flag:
+                sl_display = f"~{sl_display}"
+            sl_subtitle = "Based on current banana condition<br>and available environmental data."
+            bg_color = "var(--nb-yellow)"
 
-            with st.expander("How was this estimated?", expanded=False):
-                st.write(shelf_life.explanation)
-                st.caption(
-                    "Prototype Heuristic -- coefficients are prototype assumptions, "
-                    "NOT experimentally validated scientific constants."
-                )
+        st.markdown(f"""
+        <div style="background:{bg_color}; border:4px solid var(--nb-ink); padding:24px; box-shadow:8px 8px 0 var(--nb-ink); margin-bottom:20px;">
+            <div style="color:var(--nb-ink); font-weight:900; letter-spacing:0.1em; margin-bottom:12px;">
+                🍌 GOOD-TO-EAT WINDOW
+            </div>
+            <div style="color:var(--nb-ink); font-size:1.1rem; font-weight:700;">
+                Estimated remaining:
+            </div>
+            <div style="color:var(--nb-ink); font-size:clamp(2.5rem, 5vw, 4rem); font-weight:900; margin:10px 0;">
+                {sl_display}
+            </div>
+            <div style="color:var(--nb-ink); font-weight:600; font-size:0.95rem; line-height:1.4;">
+                {sl_subtitle}
+            </div>
+            <div style="margin-top:16px; padding-top:12px; border-top:2px solid var(--nb-ink); color:var(--nb-ink); font-weight:800; font-size:0.85rem;">
+                ⚠ Estimate — not a guarantee {uncertain_text}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-        st.warning(shelf_life.warning)
+        col_sl1, col_sl2 = st.columns(2)
+        with col_sl1:
+            st.markdown(
+                f'<div class="metric-card"><div class="metric-label">🌡 Environment</div><div class="metric-value">{temperature:.0f}°C · {humidity:.0f}%</div><div class="tech-note">{storage_condition.capitalize()} storage</div></div>',
+                unsafe_allow_html=True,
+            )
+
+        with st.expander("How was this estimated?", expanded=False):
+            st.write(shelf_life.explanation)
+            st.caption(
+                "Prototype Heuristic -- coefficients are prototype assumptions, "
+                "NOT experimentally validated scientific constants."
+            )
 
         with st.expander("Technical details"):
             st.write({

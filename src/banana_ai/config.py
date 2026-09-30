@@ -13,10 +13,10 @@ class Settings(BaseSettings):
     database_url: str = (
         "postgresql+psycopg://banana_user:banana_password@localhost:5432/banana_ai"
     )
-    # V2 is the production model. V1 remains available explicitly for
+    # V3 is the production model. V1 and V2 remain available explicitly for
     # historical training/evaluation commands.
-    model_path: str = "models/banana_cnn_v2.pt"
-    model_version: str = "banana-cnn-v2"
+    model_path: str = "models/banana_cnn_v3.pt"
+    model_version: str = "banana-cnn-v3"
     image_size: int = 224
     dataset_root: str = "data"
 

@@ -1,0 +1,242 @@
+[
+  {
+    "index": 0,
+    "true_class": "overripe",
+    "predicted_class": "ripe",
+    "confidence": 0.475360631942749,
+    "probabilities": {
+      "overripe": 0.20231689512729645,
+      "ripe": 0.475360631942749,
+      "rotten": 0.0872339978814125,
+      "unripe": 0.2350884974002838
+    }
+  },
+  {
+    "index": 6,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.5028462409973145,
+    "probabilities": {
+      "overripe": 0.3861457407474518,
+      "ripe": 0.10877605527639389,
+      "rotten": 0.5028462409973145,
+      "unripe": 0.002231951802968979
+    }
+  },
+  {
+    "index": 7,
+    "true_class": "overripe",
+    "predicted_class": "ripe",
+    "confidence": 0.8115801811218262,
+    "probabilities": {
+      "overripe": 0.16785147786140442,
+      "ripe": 0.8115801811218262,
+      "rotten": 0.015362240374088287,
+      "unripe": 0.005206109024584293
+    }
+  },
+  {
+    "index": 8,
+    "true_class": "overripe",
+    "predicted_class": "ripe",
+    "confidence": 0.6912694573402405,
+    "probabilities": {
+      "overripe": 0.2907794415950775,
+      "ripe": 0.6912694573402405,
+      "rotten": 0.012973965145647526,
+      "unripe": 0.004977182485163212
+    }
+  },
+  {
+    "index": 9,
+    "true_class": "overripe",
+    "predicted_class": "ripe",
+    "confidence": 0.7847086787223816,
+    "probabilities": {
+      "overripe": 0.17281174659729004,
+      "ripe": 0.7847086787223816,
+      "rotten": 0.039320509880781174,
+      "unripe": 0.003159007290378213
+    }
+  },
+  {
+    "index": 10,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.9770176410675049,
+    "probabilities": {
+      "overripe": 0.021739229559898376,
+      "ripe": 0.0012339281383901834,
+      "rotten": 0.9770176410675049,
+      "unripe": 9.186282113660127e-06
+    }
+  },
+  {
+    "index": 11,
+    "true_class": "overripe",
+    "predicted_class": "ripe",
+    "confidence": 0.371482253074646,
+    "probabilities": {
+      "overripe": 0.1831698715686798,
+      "ripe": 0.371482253074646,
+      "rotten": 0.3693752586841583,
+      "unripe": 0.07597256451845169
+    }
+  },
+  {
+    "index": 12,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.7566965818405151,
+    "probabilities": {
+      "overripe": 0.2329557240009308,
+      "ripe": 0.010273568332195282,
+      "rotten": 0.7566965818405151,
+      "unripe": 7.418101449729875e-05
+    }
+  },
+  {
+    "index": 14,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.8788607120513916,
+    "probabilities": {
+      "overripe": 0.11832083016633987,
+      "ripe": 0.0025183092802762985,
+      "rotten": 0.8788607120513916,
+      "unripe": 0.00030013793730176985
+    }
+  },
+  {
+    "index": 15,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.5457097887992859,
+    "probabilities": {
+      "overripe": 0.06550197303295135,
+      "ripe": 0.37141165137290955,
+      "rotten": 0.5457097887992859,
+      "unripe": 0.017376534640789032
+    }
+  },
+  {
+    "index": 16,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.8999423980712891,
+    "probabilities": {
+      "overripe": 0.09873729944229126,
+      "ripe": 0.001305763958953321,
+      "rotten": 0.8999423980712891,
+      "unripe": 1.4467555047303904e-05
+    }
+  },
+  {
+    "index": 17,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.9951294660568237,
+    "probabilities": {
+      "overripe": 0.004738899879157543,
+      "ripe": 0.0001316895941272378,
+      "rotten": 0.9951294660568237,
+      "unripe": 5.302916150640158e-08
+    }
+  },
+  {
+    "index": 18,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.9912794232368469,
+    "probabilities": {
+      "overripe": 0.00754966028034687,
+      "ripe": 0.001170813455246389,
+      "rotten": 0.9912794232368469,
+      "unripe": 7.132841517432098e-08
+    }
+  },
+  {
+    "index": 19,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.586798369884491,
+    "probabilities": {
+      "overripe": 0.3964461088180542,
+      "ripe": 0.016729187220335007,
+      "rotten": 0.586798369884491,
+      "unripe": 2.630924791446887e-05
+    }
+  },
+  {
+    "index": 22,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.5571935772895813,
+    "probabilities": {
+      "overripe": 0.28249624371528625,
+      "ripe": 0.15429191291332245,
+      "rotten": 0.5571935772895813,
+      "unripe": 0.0060182674787938595
+    }
+  },
+  {
+    "index": 23,
+    "true_class": "overripe",
+    "predicted_class": "ripe",
+    "confidence": 0.440837562084198,
+    "probabilities": {
+      "overripe": 0.1513632833957672,
+      "ripe": 0.440837562084198,
+      "rotten": 0.28443461656570435,
+      "unripe": 0.12336456030607224
+    }
+  },
+  {
+    "index": 24,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.6545246243476868,
+    "probabilities": {
+      "overripe": 0.3406795561313629,
+      "ripe": 0.004753106739372015,
+      "rotten": 0.6545246243476868,
+      "unripe": 4.2709576518973336e-05
+    }
+  },
+  {
+    "index": 25,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.9279626607894897,
+    "probabilities": {
+      "overripe": 0.07108187675476074,
+      "ripe": 0.0009543130290694535,
+      "rotten": 0.9279626607894897,
+      "unripe": 1.1248484952375293e-06
+    }
+  },
+  {
+    "index": 26,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.6098836660385132,
+    "probabilities": {
+      "overripe": 0.38728490471839905,
+      "ripe": 0.0027960159350186586,
+      "rotten": 0.6098836660385132,
+      "unripe": 3.5377561289351434e-05
+    }
+  },
+  {
+    "index": 27,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.6502982378005981,
+    "probabilities": {
+      "overripe": 0.31104159355163574,
+      "ripe": 0.03700108081102371,
+      "rotten": 0.6502982378005981,
+      "unripe": 0.001659143017604947
+    }
+  }
+]

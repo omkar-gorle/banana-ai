@@ -65,8 +65,8 @@ def predict_image(image_path: str, model, transform, class_names, device):
     }
 
 
-def predict(image_path: str, model_path: str = "models/banana_cnn_v2.pt"):
-    """Run inference using the production V2 checkpoint by default."""
+def predict(image_path: str, model_path: str = "models/banana_cnn_v3.pt"):
+    """Run inference using the production V3 checkpoint by default."""
     model, transform, class_names, device = load_model(model_path)
     return predict_image(image_path, model, transform, class_names, device)
 
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     parser.add_argument("--image", required=True)
     parser.add_argument(
         "--model",
-        default="models/banana_cnn_v2.pt",
+        default="models/banana_cnn_v3.pt",
     )
     args = parser.parse_args()
 

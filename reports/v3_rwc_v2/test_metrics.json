@@ -1,0 +1,104 @@
+{
+  "version": "v3_rwc_v2",
+  "model_version": "banana-cnn-v3",
+  "checkpoint_path": "models\\banana_cnn_v3.pt",
+  "best_val_macro_f1": 0.9661280562978563,
+  "accuracy": 0.625,
+  "macro_precision": 0.85,
+  "macro_recall": 0.625,
+  "macro_f1": 0.6428571428571428,
+  "weighted_precision": 0.85,
+  "weighted_recall": 0.625,
+  "weighted_f1": 0.6428571428571428,
+  "classification_report": {
+    "overripe": {
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1-score": 0.6666666666666666,
+      "support": 2.0
+    },
+    "ripe": {
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1-score": 0.6666666666666666,
+      "support": 2.0
+    },
+    "rotten": {
+      "precision": 0.4,
+      "recall": 1.0,
+      "f1-score": 0.5714285714285714,
+      "support": 2.0
+    },
+    "unripe": {
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1-score": 0.6666666666666666,
+      "support": 2.0
+    },
+    "accuracy": 0.625,
+    "macro avg": {
+      "precision": 0.85,
+      "recall": 0.625,
+      "f1-score": 0.6428571428571428,
+      "support": 8.0
+    },
+    "weighted avg": {
+      "precision": 0.85,
+      "recall": 0.625,
+      "f1-score": 0.6428571428571428,
+      "support": 8.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      1,
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      1,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      2,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      1
+    ]
+  ],
+  "confusion_matrix_normalized": [
+    [
+      0.5,
+      0.0,
+      0.5,
+      0.0
+    ],
+    [
+      0.0,
+      0.5,
+      0.5,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.5,
+      0.5
+    ]
+  ]
+}

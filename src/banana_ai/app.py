@@ -452,7 +452,7 @@ with st.sidebar:
     with st.expander("How it works"):
         st.write(
             "Images are resized to 224x224, normalized with ImageNet statistics, "
-            "and classified by banana-cnn-v2 (custom CNN, ~422,788 params). "
+            f"and classified by {settings.model_version}. "
             "Probabilities are raw softmax scores -- not calibrated confidence."
         )
     with st.expander("Technical details"):
@@ -603,26 +603,50 @@ def page_analyze():
         probabilities = result["probabilities"]
         input_method = st.session_state.get("prediction_input_method", "upload")
 
+        is_uncertain = False
+        if settings.ripeness_abstention_enabled and confidence < settings.ripeness_abstention_threshold:
+            is_uncertain = True
+
         st.markdown('<h2 class="section-title">Analysis complete</h2>', unsafe_allow_html=True)
 
         detection_conf = st.session_state.get("banana_detection_confidence", 0.0)
         preview_path = st.session_state.get("prediction_path")
         result_col, image_col = st.columns([1.15, 0.85], gap="large")
         with result_col:
-            st.markdown(f"""
-            <div class="result-panel">
-              <div class="result-label">🍌 AI analysis complete</div>
-              <div class="result-stage stage-{stage}">{stage.upper()}</div>
-              <div class="result-confidence"><strong>{confidence:.1%}</strong> AI confidence</div>
-              <div class="confidence-track"><div class="confidence-fill" style="width:{confidence:.1%}"></div></div>
-              <div class="tech-note">Raw softmax score, not a calibrated probability.</div>
-              <div class="metric-card" style="margin-top:18px">
-                <div class="metric-label">Banana gate</div>
-                <div class="metric-value">{detection_conf:.1%} detected</div>
-                <div class="tech-note">Validated before ripeness analysis.</div>
-              </div>
-            </div>
-            """, unsafe_allow_html=True)
+            if is_uncertain:
+                st.markdown(f"""
+                <div style="background:var(--nb-paper);border:4px solid var(--nb-ink);border-radius:0;padding:24px;margin:0;box-shadow:8px 8px 0 var(--nb-ink);height:100%;">
+                  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+                    <span style="font-size:2rem">&#9888;&#65039;</span>
+                    <h3 style="color:var(--nb-ink);margin:0;font-size:1.6rem;font-weight:900;text-transform:uppercase;line-height:1.1;">PREDICTION UNCERTAIN</h3>
+                  </div>
+                  <p style="color:var(--nb-ink);font-size:1.0rem;font-weight:600;margin:0 0 10px;line-height:1.4">
+                    The model does not have enough confidence to provide a reliable ripeness result.
+                  </p>
+                  <p style="color:var(--nb-ink);font-size:1.0rem;font-weight:600;margin:0 0 10px;line-height:1.4">
+                    Please retake the photo with the banana clearly visible, good lighting, and minimal blur.
+                  </p>
+                  <div style="margin-top:14px;display:flex;align-items:center;gap:8px">
+                    <span class="gate-badge gate-badge-fail" style="background:var(--nb-yellow);color:var(--nb-ink);border:2px solid var(--nb-ink);font-weight:900;">Confidence: {confidence:.1%}</span>
+                    <span style="color:var(--nb-deep);font-weight:700;font-size:0.85rem;">(Threshold: {settings.ripeness_abstention_threshold:.1%})</span>
+                  </div>
+                  <p style="color:var(--nb-deep);font-size:0.85rem;font-weight:700;margin-top:10px;">Top candidate: {stage.capitalize()}</p>
+                </div>""", unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="result-panel">
+                  <div class="result-label">🍌 AI analysis complete</div>
+                  <div class="result-stage stage-{stage}">{stage.upper()}</div>
+                  <div class="result-confidence"><strong>{confidence:.1%}</strong> AI confidence</div>
+                  <div class="confidence-track"><div class="confidence-fill" style="width:{confidence:.1%}"></div></div>
+                  <div class="tech-note">Raw softmax score, not a calibrated probability.</div>
+                  <div class="metric-card" style="margin-top:18px">
+                    <div class="metric-label">Banana gate</div>
+                    <div class="metric-value">{detection_conf:.1%} detected</div>
+                    <div class="tech-note">Validated before ripeness analysis.</div>
+                  </div>
+                </div>
+                """, unsafe_allow_html=True)
         with image_col:
             st.markdown('<div class="result-panel"><div class="result-label">Your image</div>', unsafe_allow_html=True)
             if preview_path and Path(preview_path).exists():
@@ -676,25 +700,37 @@ def page_analyze():
             sl_subtitle = "Based on current banana condition<br>and available environmental data."
             bg_color = "var(--nb-yellow)"
 
-        st.markdown(f"""
-        <div style="background:{bg_color}; border:4px solid var(--nb-ink); padding:24px; box-shadow:8px 8px 0 var(--nb-ink); margin-bottom:20px;">
-            <div style="color:var(--nb-ink); font-weight:900; letter-spacing:0.1em; margin-bottom:12px;">
-                🍌 GOOD-TO-EAT WINDOW
+        if is_uncertain:
+            st.markdown(f"""
+            <div style="background:var(--nb-paper); border:4px dashed var(--nb-ink); padding:24px; box-shadow:none; margin-bottom:20px;">
+                <div style="color:var(--nb-ink); font-weight:900; letter-spacing:0.1em; margin-bottom:12px;">
+                    🍌 GOOD-TO-EAT WINDOW
+                </div>
+                <div style="color:var(--nb-ink); font-weight:600; font-size:1.05rem; line-height:1.4;">
+                    Good-to-Eat Window unavailable because the prediction is uncertain.
+                </div>
             </div>
-            <div style="color:var(--nb-ink); font-size:1.1rem; font-weight:700;">
-                Estimated remaining:
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown(f"""
+            <div style="background:{bg_color}; border:4px solid var(--nb-ink); padding:24px; box-shadow:8px 8px 0 var(--nb-ink); margin-bottom:20px;">
+                <div style="color:var(--nb-ink); font-weight:900; letter-spacing:0.1em; margin-bottom:12px;">
+                    🍌 GOOD-TO-EAT WINDOW
+                </div>
+                <div style="color:var(--nb-ink); font-size:1.1rem; font-weight:700;">
+                    Estimated remaining:
+                </div>
+                <div style="color:var(--nb-ink); font-size:clamp(2.5rem, 5vw, 4rem); font-weight:900; margin:10px 0;">
+                    {sl_display}
+                </div>
+                <div style="color:var(--nb-ink); font-weight:600; font-size:0.95rem; line-height:1.4;">
+                    {sl_subtitle}
+                </div>
+                <div style="margin-top:16px; padding-top:12px; border-top:2px solid var(--nb-ink); color:var(--nb-ink); font-weight:800; font-size:0.85rem;">
+                    ⚠ Estimate — not a guarantee {uncertain_text}
+                </div>
             </div>
-            <div style="color:var(--nb-ink); font-size:clamp(2.5rem, 5vw, 4rem); font-weight:900; margin:10px 0;">
-                {sl_display}
-            </div>
-            <div style="color:var(--nb-ink); font-weight:600; font-size:0.95rem; line-height:1.4;">
-                {sl_subtitle}
-            </div>
-            <div style="margin-top:16px; padding-top:12px; border-top:2px solid var(--nb-ink); color:var(--nb-ink); font-weight:800; font-size:0.85rem;">
-                ⚠ Estimate — not a guarantee {uncertain_text}
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
         col_sl1, col_sl2 = st.columns(2)
         with col_sl1:
@@ -762,11 +798,14 @@ def page_analyze():
         st.divider()
         if show_gradcam:
             with st.expander("Why did the model predict this? (Grad-CAM)"):
-                st.markdown(
-                    "**The highlighted regions show image areas that contributed most "
-                    "to the model's prediction.** Grad-CAM is an explanation aid -- "
-                    "it does NOT prove the banana is rotten/ripe/etc."
-                )
+                if is_uncertain:
+                    st.markdown("**Model attention visualization — prediction uncertain**")
+                else:
+                    st.markdown(
+                        "**The highlighted regions show image areas that contributed most "
+                        "to the model's prediction.** Grad-CAM is an explanation aid -- "
+                        "it does NOT prove the banana is rotten/ripe/etc."
+                    )
                 try:
                     from banana_ai.ml.explainability import generate_gradcam_overlay
                     model_obj, _, _, device = cached_model(settings.model_path)
@@ -838,7 +877,9 @@ def page_analyze():
         # FEATURE 19 -- Save prediction (explicit only)
         st.divider()
         st.subheader("Save Prediction")
-        if st.button("Save Prediction", type="secondary", key="save_pred_btn"):
+        if is_uncertain:
+            st.info("Uncertain predictions are not persisted to the database.")
+        elif st.button("Save Prediction", type="secondary", key="save_pred_btn"):
             if not should_save_prediction(
                 st.session_state.get("saved_prediction_path"),
                 st.session_state.get("prediction_path"),
@@ -973,11 +1014,14 @@ def page_batch():
                             result = predict_image(
                                 str(tmp_path), model_obj, transform, classes, device
                             )
-                            sl = estimate_shelf_life(
-                                result["stage"], temperature, humidity, storage_condition
-                            )
+                            if settings.ripeness_abstention_enabled and result["confidence"] < settings.ripeness_abstention_threshold:
+                                result["stage"] = "uncertain"
+                                result["estimated_days_left"] = "N/A (Uncertain)"
+                            else:
+                                sl = estimate_shelf_life(result["stage"])
+                                result["estimated_days_left"] = sl.display()
+
                             result["filename"] = bf.name
-                            result["estimated_days_left"] = sl.display()
                             result["banana_detection_confidence"] = banana_res.confidence
                             result["banana_state"] = "BANANA"
                             batch_results.append(result)

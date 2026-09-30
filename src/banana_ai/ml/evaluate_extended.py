@@ -49,10 +49,25 @@ def evaluate_checkpoint(
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 
-    _, _, test_loader, _ = build_loaders(
-        dataset_root=dataset_root,
-        batch_size=16,
-    )
+    from torchvision import datasets, transforms
+    from torch.utils.data import DataLoader
+    
+    test_path = Path(dataset_root) / "test"
+    if not test_path.exists():
+        test_path = Path(dataset_root)
+        
+    eval_transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225],
+        ),
+    ])
+    
+    test_dataset = datasets.ImageFolder(str(test_path), transform=eval_transform)
+    test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
+
 
     y_true = []
     y_pred = []

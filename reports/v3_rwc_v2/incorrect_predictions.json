@@ -1,0 +1,38 @@
+[
+  {
+    "index": 1,
+    "true_class": "overripe",
+    "predicted_class": "rotten",
+    "confidence": 0.7268253564834595,
+    "probabilities": {
+      "overripe": 0.2731746733188629,
+      "ripe": 1.0447005760472194e-10,
+      "rotten": 0.7268253564834595,
+      "unripe": 5.080416542644316e-14
+    }
+  },
+  {
+    "index": 3,
+    "true_class": "ripe",
+    "predicted_class": "rotten",
+    "confidence": 0.5723010897636414,
+    "probabilities": {
+      "overripe": 0.24246448278427124,
+      "ripe": 0.17771948873996735,
+      "rotten": 0.5723010897636414,
+      "unripe": 0.0075148893520236015
+    }
+  },
+  {
+    "index": 7,
+    "true_class": "unripe",
+    "predicted_class": "rotten",
+    "confidence": 0.9999984502792358,
+    "probabilities": {
+      "overripe": 1.4910947356838733e-06,
+      "ripe": 2.367477602849277e-10,
+      "rotten": 0.9999984502792358,
+      "unripe": 8.209582952876078e-17
+    }
+  }
+]

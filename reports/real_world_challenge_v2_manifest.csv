@@ -1,0 +1,5 @@
+filename,class,source_dataset,real_vs_synthetic,split,md5
+banana_unripe.jpg,unripe,tests/real_world_banana_set,real,test,c0dcc98c9f8663acf3d18d35749ad1eb
+banana_ripe.jpg,ripe,tests/real_world_banana_set,real,test,3b16f937e552b94cbf0ca67fadc1c349
+banana_overripe.jpg,overripe,tests/real_world_banana_set,real,test,5569ef115a00003878e32df8d381210a
+banana_rotten.jpg,rotten,tests/real_world_banana_set,real,test,588a2906c89ab5aad39eacf3bea83cc5

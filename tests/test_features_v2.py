@@ -439,13 +439,13 @@ class TestAPICompatibility:
         response = client.get("/health")
         assert "model_version" in response.json()
 
-    def test_health_model_version_is_v2(self):
+    def test_health_model_version_is_v3(self):
         from fastapi.testclient import TestClient
         from banana_ai.api.main import app
 
         client = TestClient(app)
         response = client.get("/health")
-        assert response.json()["model_version"] == "banana-cnn-v2"
+        assert response.json()["model_version"] == "banana-cnn-v3"
 
 
 # ===========================================================================
@@ -482,7 +482,7 @@ class TestReportGeneration:
     def test_html_report_contains_model_version(self):
         from banana_ai.services.report import generate_scan_report_html
         html = generate_scan_report_html(self._sample_prediction)
-        assert "banana-cnn-v2" in html
+        assert "banana-cnn-v3" in html
 
     def test_html_report_with_env_data(self):
         from banana_ai.services.report import generate_scan_report_html
@@ -534,11 +534,11 @@ class TestModelVersionConsistency:
 
     def test_config_model_version(self):
         from banana_ai.config import settings
-        assert settings.model_version == "banana-cnn-v2"
+        assert settings.model_version == "banana-cnn-v3"
 
-    def test_model_path_is_v2(self):
+    def test_model_path_is_v3(self):
         from banana_ai.config import settings
-        assert "v2" in settings.model_path
+        assert "v3" in settings.model_path
 
     def test_shelf_life_method_is_heuristic(self):
         est = estimate_shelf_life("ripe")

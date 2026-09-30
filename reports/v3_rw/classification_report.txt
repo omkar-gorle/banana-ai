@@ -1,0 +1,19 @@
+Test Evaluation: v3_rw
+Model: banana-cnn-v3
+Checkpoint: models/banana_cnn_v3.pt
+
+Accuracy: 0.8750
+Macro F1: 0.8744
+Weighted F1: 0.8748
+
+              precision    recall  f1-score   support
+
+    overripe       0.84      0.81      0.82       151
+        ripe       0.90      0.85      0.87       194
+      rotten       0.83      0.95      0.89       185
+      unripe       0.94      0.89      0.91       150
+
+    accuracy                           0.88       680
+   macro avg       0.88      0.87      0.87       680
+weighted avg       0.88      0.88      0.87       680
+

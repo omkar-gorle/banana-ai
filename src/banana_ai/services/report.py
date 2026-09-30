@@ -34,7 +34,7 @@ def generate_scan_report_html(
     storage_condition: Optional[str] = None,
     shelf_life: Optional[Any] = None,
     input_method: str = "upload",
-    model_version: str = "banana-cnn-v2",
+    model_version: str = "banana-cnn-v3",
 ) -> str:
     """Generate an HTML scan report.
 
@@ -154,7 +154,7 @@ def generate_scan_report_csv(
     storage_condition: Optional[str] = None,
     shelf_life: Optional[Any] = None,
     input_method: str = "upload",
-    model_version: str = "banana-cnn-v2",
+    model_version: str = "banana-cnn-v3",
 ) -> str:
     """Generate a CSV scan report as a string."""
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")

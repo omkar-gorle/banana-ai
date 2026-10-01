@@ -287,7 +287,7 @@ def _validate_and_save_temp(
     Please capture a clear image of a banana.
   </p>
   <div style="background:rgba(255,255,255,0.06);border-left:3px solid #ef5350;border-radius:6px;padding:10px 14px;margin:10px 0;color:#ffcdd2;font-size:0.88rem">
-    &#128737;&#65039; <strong>V2 ANALYSIS SKIPPED:</strong> Ripeness, Grad-CAM, shelf-life, and persistence are blocked.
+    &#128737;&#65039; <strong>RIPENESS ANALYSIS SKIPPED:</strong> Ripeness, Grad-CAM, shelf-life, and persistence are blocked.
   </div>
   <p style="color:#ffcdd2;margin:10px 0 0;font-size:0.9rem">
     Please capture or upload a clear photo of a real banana (unripe, ripe, overripe, or rotten).
@@ -459,6 +459,9 @@ with st.sidebar:
         st.code(settings.model_path, language=None)
         st.write(f"**Version:** `{settings.model_version}`")
         st.caption("Production checkpoints are frozen and loaded through the cached inference path.")
+
+    from banana_ai.services.diagnostics import render_diagnostics_ui
+    render_diagnostics_ui()
 
 
 # ===========================================================================

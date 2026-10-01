@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     ripeness_abstention_enabled: bool = True
     ripeness_abstention_threshold: float = 0.70
 
+    # Diagnostic tools
+    banana_diagnostics: bool = False
+
     # Dedicated binary banana-vs-non-banana gate checkpoint and threshold.
     banana_gate_model_path: str = "models/banana_gate_best.pt"
     # Keep the application policy at 0.50 to preserve the existing
